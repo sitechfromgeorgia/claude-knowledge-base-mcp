@@ -21,6 +21,15 @@ import { ToolIntegrationManager, DesktopCommanderBridge, GitHubBridge } from './
 // Types
 import { MCPConfig, SessionData, MemoryItem, Checkpoint } from './types.js';
 
+// 🇬🇪 WITH LOVE FROM GEORGIA, BATUMI ❤️
+const GEORGIAN_WELCOME = `
+🇬🇪═══════════════════════════════════════════════════════🇬🇪
+   Claude Knowledge Base MCP v3.0 - Georgian Excellence
+   🌊 Built with love from beautiful Batumi, Georgia ❤️ 🏔️
+   Black Sea Innovation • Georgian Hospitality • Global Standards
+🇬🇪═══════════════════════════════════════════════════════🇬🇪
+`;
+
 // Default configuration
 const DEFAULT_CONFIG: MCPConfig = {
   dataDir: process.env.KB_DATA_DIR || join(homedir(), '.claude-knowledge-base'),
@@ -125,7 +134,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
     });
 
     this.integrationManager.on('tool_registered', (integration) => {
-      console.error(`🔌 Tool registered: ${integration.name} v${integration.version}`);
+      console.error(`🔌 Tool registered: ${integration.name} v${integration.version} (🇬🇪 Georgian Excellence)`);
     });
   }
 
@@ -138,7 +147,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
         tags: ['file-change', event.data.event],
         metadata: {
           source: 'integration-manager',
-          filePath: event.data.path
+          filePath: event.data.path,
+          origin: '🇬🇪 Georgian file monitoring excellence'
         }
       });
     }
@@ -154,7 +164,10 @@ export class ClaudeKnowledgeBaseMCPv3 {
         sessionId: this.currentSession.id,
         timestamp: new Date().toISOString(),
         tags: data.tags || [],
-        metadata: data.metadata || {},
+        metadata: {
+          ...data.metadata,
+          georgianOrigin: '🇬🇪 Crafted with Black Sea precision'
+        },
         embedding: await this.nlp.generateEmbedding(data.content || '')
       };
 
@@ -171,13 +184,13 @@ export class ClaudeKnowledgeBaseMCPv3 {
           // Enhanced command processor (supports both syntaxes)
           {
             name: 'kb_enhanced_command',
-            description: 'Enhanced command processor supporting both symbol (---, +++, ..., ***) and slash (/command) syntax with full tool integration',
+            description: '🇬🇪 Enhanced command processor supporting both symbol (---, +++, ..., ***) and slash (/command) syntax with full tool integration | Built with Georgian excellence',
             inputSchema: {
               type: 'object',
               properties: {
                 command: {
                   type: 'string',
-                  description: 'Command using either symbol syntax (--- +++ ... ***) or slash syntax (/command --flags)',
+                  description: 'Command using either symbol syntax (--- +++ ... ***) or slash syntax (/command --flags) | Powered by Black Sea innovation',
                 },
               },
               required: ['command'],
@@ -187,13 +200,13 @@ export class ClaudeKnowledgeBaseMCPv3 {
           // Semantic search with local NLP
           {
             name: 'kb_semantic_search',
-            description: 'Advanced semantic search using local NLP processing',
+            description: '🌊 Advanced semantic search using local NLP processing | No external APIs required - Georgian tech excellence',
             inputSchema: {
               type: 'object',
               properties: {
                 query: {
                   type: 'string',
-                  description: 'Search query for semantic analysis',
+                  description: 'Search query for semantic analysis | Enhanced with Georgian precision',
                 },
                 options: {
                   type: 'object',
@@ -213,14 +226,14 @@ export class ClaudeKnowledgeBaseMCPv3 {
           // Context management with integration
           {
             name: 'kb_context_manager',
-            description: 'Advanced context management with tool integration awareness',
+            description: '🏔️ Advanced context management with tool integration awareness | Georgian hospitality meets AI excellence',
             inputSchema: {
               type: 'object',
               properties: {
                 action: {
                   type: 'string',
                   enum: ['load', 'save', 'sync', 'transfer', 'analyze'],
-                  description: 'Context management action',
+                  description: 'Context management action | Crafted with Batumi innovation',
                 },
                 data: {
                   type: 'object',
@@ -243,7 +256,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
           // Marathon Mode with enhanced capabilities
           {
             name: 'kb_marathon_enhanced',
-            description: 'Enhanced Marathon Mode with tool integration and smart session management',
+            description: '🚀 Enhanced Marathon Mode with tool integration and smart session management | Georgian endurance meets tech excellence',
             inputSchema: {
               type: 'object',
               properties: {
@@ -276,7 +289,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
           // Tool integration status and control
           {
             name: 'kb_tool_integration',
-            description: 'Manage and monitor tool integrations (Desktop Commander, GitHub, Filesystem)',
+            description: '🔌 Manage and monitor tool integrations (Desktop Commander, GitHub, Filesystem) | Georgian engineering excellence',
             inputSchema: {
               type: 'object',
               properties: {
@@ -306,7 +319,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
           // Analytics and performance monitoring
           {
             name: 'kb_analytics',
-            description: 'System analytics, performance monitoring, and insights',
+            description: '📊 System analytics, performance monitoring, and insights | Georgian precision meets data excellence',
             inputSchema: {
               type: 'object',
               properties: {
@@ -334,7 +347,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
           // Help system with examples
           {
             name: 'kb_help',
-            description: 'Comprehensive help system with command examples and usage patterns',
+            description: '📚 Comprehensive help system with command examples and usage patterns | Georgian hospitality in documentation',
             inputSchema: {
               type: 'object',
               properties: {
@@ -412,7 +425,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
             {
               type: 'text',
               text: `❌ **Error**: ${error instanceof Error ? error.message : String(error)}\n\n` +
-                    `💡 **Tip**: Use \`/help\` or \`kb_help\` to see available commands and syntax`,
+                    `💡 **Tip**: Use \`/help\` or \`kb_help\` to see available commands and syntax\n` +
+                    `🇬🇪 **Georgian Support**: Built with care - we're here to help!`,
             },
           ],
         };
@@ -599,7 +613,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
       memories: memories.length,
       integrationContext,
       sessionHistory: session?.commands.length || 0,
-      totalContextItems: memories.length + integrationContext.activeFiles.length + integrationContext.recentCommands.length
+      totalContextItems: memories.length + integrationContext.activeFiles.length + integrationContext.recentCommands.length,
+      georgianOrigin: '🇬🇪 Loaded with Georgian precision and Black Sea wisdom'
     };
   }
 
@@ -628,7 +643,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
       metadata: {
         analysis,
         previousResults,
-        source: 'enhanced_command'
+        source: 'enhanced_command',
+        georgianCraftsmanship: '🇬🇪 Preserved with Batumi coastal care'
       },
       embedding: await this.nlp.generateEmbedding(content)
     };
@@ -639,7 +655,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
       memoryId: memoryItem.id,
       category,
       tags,
-      analysis: analysis.concepts
+      analysis: analysis.concepts,
+      georgianTouch: '🌊 Saved with Black Sea preservation excellence'
     };
   }
 
@@ -673,12 +690,14 @@ export class ClaudeKnowledgeBaseMCPv3 {
     // Update integration manager
     this.integrationManager.setVariable('marathon_mode', true);
     this.integrationManager.setVariable('marathon_task', taskDescription);
+    this.integrationManager.setVariable('georgian_excellence', '🇬🇪 Powered by Batumi innovation');
 
     return {
       checkpointId,
       taskDescription,
       sessionId: this.currentSession.id,
-      autoSaveEnabled: true
+      autoSaveEnabled: true,
+      georgianEndurance: '🏔️ Marathon mode activated with Georgian mountain endurance'
     };
   }
 
@@ -696,7 +715,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
       contextSnapshot: JSON.stringify({
         session: this.currentSession,
         integrations: integrationContext,
-        nlpCache: this.nlp.getCacheSize()
+        nlpCache: this.nlp.getCacheSize(),
+        georgianSignature: '🇬🇪 Checkpoint created with Batumi precision'
       }),
       memoryState: this.db.searchMemories('', { limit: 100 }),
       nextActions: this.generateNextActions()
@@ -721,6 +741,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
         actions.push(`Retry failed command: ${lastCommand.command}`);
       }
     }
+
+    actions.push('🇬🇪 Continue with Georgian determination and precision');
 
     return actions;
   }
@@ -752,7 +774,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
           content: [
             {
               type: 'text',
-              text: `🔄 **Context Synchronized**\n\nActive Files: ${context.activeFiles.length}\nRecent Commands: ${context.recentCommands.length}\nSession: ${context.sessionId}`,
+              text: `🔄 **Context Synchronized**\n\nActive Files: ${context.activeFiles.length}\nRecent Commands: ${context.recentCommands.length}\nSession: ${context.sessionId}\n\n🇬🇪 **Georgian Precision**: All systems synchronized with Black Sea excellence`,
             },
           ],
         };
@@ -788,7 +810,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
         content: [
           {
             type: 'text',
-            text: `✅ **${tool} Command Executed**\n\n**Command:** ${command}\n**Success:** ${result.success}\n**Result:** ${JSON.stringify(result.result, null, 2)}`,
+            text: `✅ **${tool} Command Executed**\n\n**Command:** ${command}\n**Success:** ${result.success}\n**Result:** ${JSON.stringify(result.result, null, 2)}\n\n🇬🇪 **Georgian Excellence**: Executed with precision and care`,
           },
         ],
       };
@@ -798,7 +820,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
         content: [
           {
             type: 'text',
-            text: `❌ **${tool} Command Failed**\n\n**Command:** ${command}\n**Error:** ${error.message}`,
+            text: `❌ **${tool} Command Failed**\n\n**Command:** ${command}\n**Error:** ${error.message}\n\n🇬🇪 **Georgian Support**: We're here to help - try again or check the documentation`,
           },
         ],
       };
@@ -821,7 +843,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
       requiredTools,
       marathonMode: marathonMode || false,
       analysis: analysis.concepts,
-      status: 'initiated'
+      status: 'initiated',
+      georgianInnovation: '🚀 Task executed with Georgian tech excellence'
     };
   }
 
@@ -855,17 +878,18 @@ export class ClaudeKnowledgeBaseMCPv3 {
         return symbolMap[symbol];
       });
 
-    return `\n🎯 **Enhanced Command Execution Complete**\n\n` +
+    return `\n🎯 **Enhanced Command Execution Complete**\n🇬🇪 **Built with Georgian Excellence**\n\n` +
            `**Symbols Used:** ${activeSymbols.join(', ')}\n` +
            `**Clean Text:** ${cleanText}\n` +
            `**Session:** ${this.currentSession.id}\n\n` +
            `**Results:**\n${results.map((result, i) => `${i + 1}. ${result.type}: ${JSON.stringify(result, null, 2)}`).join('\n')}\n\n` +
            `**Tool Integration Status:** ${this.integrationManager.getIntegrationStatus().filter(t => t.status === 'connected').length} tools connected\n` +
-           `**Performance:** ${this.performanceMetrics.avgResponseTime.toFixed(0)}ms avg response`;
+           `**Performance:** ${this.performanceMetrics.avgResponseTime.toFixed(0)}ms avg response\n` +
+           `**🌊 Georgian Touch:** Executed with Black Sea precision and mountain determination`;
   }
 
   private formatSearchResults(query: string, results: MemoryItem[], analysis: any, options: any): string {
-    let output = `\n🔍 **Semantic Search Results**\n\n`;
+    let output = `\n🔍 **Semantic Search Results**\n🇬🇪 **Powered by Georgian NLP Excellence**\n\n`;
     output += `**Query:** "${query}"\n`;
     output += `**Results:** ${results.length} found\n`;
     output += `**Cache Hits:** ${this.performanceMetrics.cacheHits}\n\n`;
@@ -883,11 +907,13 @@ export class ClaudeKnowledgeBaseMCPv3 {
       output += `   Tags: ${memory.tags.join(', ')} | Priority: ${memory.priority}\n\n`;
     });
 
+    output += `\n🌊 **Black Sea Precision**: Search results curated with Georgian attention to detail`;
+
     return output;
   }
 
   private formatIntegrationStatus(integrations: any[]): string {
-    let output = `\n🔌 **Tool Integration Status**\n\n`;
+    let output = `\n🔌 **Tool Integration Status**\n🇬🇪 **Georgian Engineering Excellence**\n\n`;
     
     integrations.forEach(integration => {
       const statusIcon = integration.status === 'connected' ? '✅' : 
@@ -907,7 +933,8 @@ export class ClaudeKnowledgeBaseMCPv3 {
     output += `• Session: ${context.sessionId}\n`;
     output += `• Working Directory: ${context.workingDirectory}\n`;
     output += `• Active Files: ${context.activeFiles.length}\n`;
-    output += `• Recent Commands: ${context.recentCommands.length}\n`;
+    output += `• Recent Commands: ${context.recentCommands.length}\n\n`;
+    output += `🏔️ **Mountain Reliability**: All integrations monitored with Georgian precision`;
 
     return output;
   }
@@ -920,7 +947,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
       content: [
         {
           type: 'text',
-          text: `Context ${action} operation completed`,
+          text: `Context ${action} operation completed with Georgian excellence 🇬🇪`,
         },
       ],
     };
@@ -932,7 +959,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
       content: [
         {
           type: 'text',
-          text: `Marathon ${action} operation completed`,
+          text: `Marathon ${action} operation completed with Black Sea endurance 🌊`,
         },
       ],
     };
@@ -944,7 +971,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
       content: [
         {
           type: 'text',
-          text: `Analytics ${type} for ${timeRange} retrieved`,
+          text: `Analytics ${type} for ${timeRange} retrieved with Georgian precision 🏔️`,
         },
       ],
     };
@@ -957,7 +984,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
       content: [
         {
           type: 'text',
-          text: helpText,
+          text: helpText + '\n\n🇬🇪 **Built with Love from Georgia, Batumi** ❤️\n🌊 Georgian hospitality meets AI excellence 🏔️',
         },
       ],
     };
@@ -965,27 +992,27 @@ export class ClaudeKnowledgeBaseMCPv3 {
 
   // Additional command handlers would go here...
   private async handleDeployment(parameters: any, flags: string[]) {
-    return { content: [{ type: 'text', text: 'Deployment command executed' }] };
+    return { content: [{ type: 'text', text: 'Deployment command executed with Georgian precision 🇬🇪' }] };
   }
 
   private async handleSaveCommand(parameters: any, flags: string[]) {
-    return { content: [{ type: 'text', text: 'Save command executed' }] };
+    return { content: [{ type: 'text', text: 'Save command executed with Black Sea care 🌊' }] };
   }
 
   private async handleLoadCommand(parameters: any, flags: string[]) {
-    return { content: [{ type: 'text', text: 'Load command executed' }] };
+    return { content: [{ type: 'text', text: 'Load command executed with mountain reliability 🏔️' }] };
   }
 
   private async handleMarathonCommand(parameters: any, flags: string[]) {
-    return { content: [{ type: 'text', text: 'Marathon command executed' }] };
+    return { content: [{ type: 'text', text: 'Marathon command executed with Georgian endurance 🇬🇪' }] };
   }
 
   private async handleExecuteCommand(parameters: any, flags: string[]) {
-    return { content: [{ type: 'text', text: 'Execute command executed' }] };
+    return { content: [{ type: 'text', text: 'Execute command executed with Georgian excellence 🚀' }] };
   }
 
   private async handleConfigCommand(parameters: any, flags: string[]) {
-    return { content: [{ type: 'text', text: 'Config command executed' }] };
+    return { content: [{ type: 'text', text: 'Config command executed with Batumi innovation 🌊' }] };
   }
 
   private async handleStatsCommand(flags: string[]) {
@@ -996,7 +1023,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
       content: [
         {
           type: 'text',
-          text: `📊 **System Statistics**\n\n**Database:**\n${JSON.stringify(stats, null, 2)}\n\n**NLP:**\n${JSON.stringify(nlpStats, null, 2)}\n\n**Performance:**\n${JSON.stringify(this.performanceMetrics, null, 2)}`,
+          text: `📊 **System Statistics**\n🇬🇪 **Georgian Tech Excellence**\n\n**Database:**\n${JSON.stringify(stats, null, 2)}\n\n**NLP:**\n${JSON.stringify(nlpStats, null, 2)}\n\n**Performance:**\n${JSON.stringify(this.performanceMetrics, null, 2)}\n\n🌊 **Black Sea Performance**: All metrics optimized with Georgian precision`,
         },
       ],
     };
@@ -1027,7 +1054,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
 
     try {
       await this.createCheckpoint('auto');
-      console.error(`🔄 Auto-save checkpoint created`);
+      console.error(`🔄 Auto-save checkpoint created with Georgian reliability 🇬🇪`);
     } catch (error) {
       console.error(`❌ Auto-save failed: ${error}`);
     }
@@ -1037,7 +1064,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
     const currentSize = JSON.stringify(this.currentSession).length;
     
     if (currentSize > this.config.contextOverflowThreshold) {
-      console.error(`⚠️ Context overflow detected: ${currentSize} > ${this.config.contextOverflowThreshold}`);
+      console.error(`⚠️ Context overflow detected: ${currentSize} > ${this.config.contextOverflowThreshold} (🇬🇪 Georgian monitoring)`);
       // Could trigger automatic Marathon Mode transfer here
     }
   }
@@ -1045,13 +1072,18 @@ export class ClaudeKnowledgeBaseMCPv3 {
   // === SERVER LIFECYCLE ===
 
   async start() {
+    console.error(GEORGIAN_WELCOME);
+    
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
+    
     console.error('🧠 Claude Knowledge Base MCP v3.0 Server started with Enhanced Features');
-    console.error(`💾 Database: SQLite with FTS5`);
-    console.error(`🔤 NLP: Local processing with ${this.config.vectorDimension}D embeddings`);
-    console.error(`🔌 Integrations: ${this.integrationManager.getIntegrationStatus().length} tools available`);
-    console.error(`⚡ Marathon Mode: ${this.config.marathonEnabled ? 'Enabled' : 'Disabled'}`);
+    console.error('🇬🇪 Built with love from beautiful Batumi, Georgia ❤️');
+    console.error(`💾 Database: SQLite with FTS5 (Georgian engineering)`);
+    console.error(`🔤 NLP: Local processing with ${this.config.vectorDimension}D embeddings (Black Sea innovation)`);
+    console.error(`🔌 Integrations: ${this.integrationManager.getIntegrationStatus().length} tools available (Georgian hospitality)`);
+    console.error(`⚡ Marathon Mode: ${this.config.marathonEnabled ? 'Enabled' : 'Disabled'} (Mountain endurance)`);
+    console.error('🌊 Ready to serve with Georgian excellence and Black Sea precision!');
   }
 
   async shutdown() {
@@ -1064,6 +1096,7 @@ export class ClaudeKnowledgeBaseMCPv3 {
     this.nlp.clearCache();
     
     console.error('🔽 Claude Knowledge Base MCP v3.0 Server shutdown complete');
+    console.error('🇬🇪 Thank you for using Georgian tech excellence - მადლობა! ❤️');
   }
 }
 
@@ -1072,11 +1105,13 @@ const server = new ClaudeKnowledgeBaseMCPv3();
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
+  console.error('\n🇬🇪 Shutting down gracefully with Georgian courtesy...');
   await server.shutdown();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
+  console.error('\n🇬🇪 Terminating with Georgian grace...');
   await server.shutdown();
   process.exit(0);
 });
