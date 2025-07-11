@@ -2,12 +2,12 @@
   "name": "claude-knowledge-base-mcp",
   "version": "3.0.0",
   "description": "Advanced Local Knowledge Management System for Claude Desktop with SQLite, local NLP, Marathon Mode, and seamless tool integration",
-  "main": "dist/server.js",
+  "main": "dist/server-v3.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js",
+    "dev": "tsx watch src/server-v3.ts",
+    "start": "node dist/server-v3.js",
     "test": "vitest",
     "test:unit": "vitest run src/**/*.test.ts",
     "test:integration": "vitest run tests/integration/**/*.test.ts",
@@ -18,7 +18,9 @@
     "prepare": "npm run build",
     "setup": "node scripts/setup.js",
     "benchmark": "node scripts/benchmark.js",
-    "migrate": "node scripts/migrate.js"
+    "migrate": "node scripts/migrate.js",
+    "vacuum": "node scripts/vacuum.js",
+    "backup": "node scripts/backup.js"
   },
   "keywords": [
     "claude",
@@ -34,7 +36,9 @@
     "knowledge-graph",
     "desktop-commander",
     "automation",
-    "offline"
+    "offline",
+    "tool-integration",
+    "dual-syntax"
   ],
   "author": "Acura Group",
   "license": "MIT",
@@ -89,7 +93,7 @@
     "LICENSE"
   ],
   "bin": {
-    "claude-kb": "./dist/server.js"
+    "claude-kb": "./dist/server-v3.js"
   },
   "optionalDependencies": {
     "inquirer": "^9.2.12",
