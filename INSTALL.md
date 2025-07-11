@@ -1,42 +1,106 @@
-# 🔧 Installation & Setup Guide
+# 🚀 Easy Installation Guide - Claude Knowledge Base MCP v3.0
 
-## Prerequisites
+## 🎯 Quick Installation
 
-1. **Claude Desktop** - Download from [claude.ai/desktop](https://claude.ai/desktop)
-2. **Node.js 18+** - Download from [nodejs.org](https://nodejs.org/)
-3. **Git** - Download from [git-scm.com](https://git-scm.com/)
-
-## Installation Steps
-
-### 1. Clone and Install
+### Option 1: One-Line Install (Recommended)
 ```bash
-# Clone the repository
+# Automatic installation and setup
+npx claude-knowledge-base-setup
+```
+
+### Option 2: Manual Installation
+```bash
+# 1. Clone repository
 git clone https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp.git
 cd claude-knowledge-base-mcp
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Build the project
+# 3. Build project  
 npm run build
+
+# 4. Auto-configure Claude Desktop
+npm run setup
 ```
 
-### 2. Configure Claude Desktop
+### Option 3: Pre-built Binaries
+Download platform-specific binaries from [Releases](https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/releases):
+- Windows: `claude-kb-win.exe`
+- macOS: `claude-kb-darwin`
+- Linux: `claude-kb-linux`
 
-#### Find Configuration File
-- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Linux:** `~/.config/Claude/claude_desktop_config.json`
+## 🔧 Platform-Specific Instructions
 
-#### Add MCP Server Configuration
-Add the following to your `claude_desktop_config.json`:
+### Windows
+```powershell
+# Option A: Using winget (recommended)
+winget install sitechfromgeorgia.claude-knowledge-base-mcp
 
+# Option B: Manual installation
+# 1. Install Node.js 18+ from nodejs.org
+# 2. Run PowerShell as Administrator
+git clone https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp.git
+cd claude-knowledge-base-mcp
+npm install --production
+npm run build
+npm run setup
+```
+
+### macOS
+```bash
+# Option A: Using Homebrew (recommended)
+brew tap sitechfromgeorgia/tools
+brew install claude-knowledge-base-mcp
+
+# Option B: Manual installation
+git clone https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp.git
+cd claude-knowledge-base-mcp
+npm install
+npm run build
+npm run setup
+```
+
+### Linux
+```bash
+# Option A: Using snap
+snap install claude-knowledge-base-mcp
+
+# Option B: Manual installation
+git clone https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp.git
+cd claude-knowledge-base-mcp
+npm install
+npm run build
+npm run setup
+```
+
+## ⚡ Claude Desktop Configuration
+
+The installer automatically configures Claude Desktop, but you can also do it manually:
+
+### Automatic Configuration
+```bash
+# Run the auto-configurator
+npm run setup
+# OR
+npx claude-kb-config
+```
+
+### Manual Configuration
+Add to your `claude_desktop_config.json`:
+
+**Location**:
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+- **Linux**: `~/.config/claude/claude_desktop_config.json`
+
+**Basic Configuration**:
 ```json
 {
   "mcpServers": {
     "claude-knowledge-base": {
       "command": "node",
-      "args": ["/full/path/to/claude-knowledge-base-mcp/dist/server.js"],
+      "args": ["C:/path/to/claude-knowledge-base-mcp/dist/server-v3.js"],
       "env": {
         "KB_DATA_DIR": "~/.claude-knowledge-base"
       }
@@ -45,147 +109,162 @@ Add the following to your `claude_desktop_config.json`:
 }
 ```
 
-**Important:** Replace `/full/path/to/` with the actual path to your cloned repository.
-
-#### Example Full Configuration
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["/Users/username/Projects/claude-knowledge-base-mcp/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "/Users/username/.claude-knowledge-base"
-      }
-    },
-    "other-mcp-server": {
-      "command": "other-server",
-      "args": ["--port", "3000"]
-    }
-  }
-}
-```
-
-### 3. Restart Claude Desktop
-
-After adding the configuration:
-1. Close Claude Desktop completely
-2. Reopen Claude Desktop
-3. The MCP server will be automatically loaded
-
-### 4. Verify Installation
-
-Open a new chat in Claude Desktop and try:
-
-```
---- Test knowledge base loading
-```
-
-You should see a response indicating the knowledge base system is active.
-
-## Configuration Options
-
-### Environment Variables
-
-- **`KB_DATA_DIR`** - Directory for knowledge base storage (default: `~/.claude-knowledge-base`)
-
-### Data Directory Structure
-
-The knowledge base creates the following structure:
-
-```
-~/.claude-knowledge-base/
-├── infrastructure.json     # Server details, services, credentials
-├── projects.json          # Active tasks, priorities, progress  
-├── interactions.json      # Important conversations, solutions
-├── workflows.json         # Automation, integrations, processes
-├── insights.json          # Analysis, documentation, learnings
-├── marathon-state.json    # Marathon Mode continuation state
-└── sessions/              # Session-specific data
-    ├── session-uuid-1.json
-    ├── session-uuid-2.json
-    └── ...
-```
-
-## Troubleshooting
+## 🛠️ Troubleshooting Installation
 
 ### Common Issues
 
-#### MCP Server Not Loading
-1. Check that the path in `claude_desktop_config.json` is correct
-2. Ensure Node.js 18+ is installed: `node --version`
-3. Verify the build was successful: `ls dist/server.js`
-4. Check Claude Desktop logs for error messages
-
-#### Permission Issues
+**1. Node.js Version**
 ```bash
-# Ensure proper permissions
-chmod +x dist/server.js
+# Check Node.js version (requires 18+)
+node --version
 
-# Create data directory manually if needed
-mkdir -p ~/.claude-knowledge-base
+# Update Node.js if needed
+# Windows: Download from nodejs.org
+# macOS: brew install node  
+# Linux: Follow distro-specific instructions
 ```
 
-#### Build Errors
+**2. Dependencies Issues**
 ```bash
-# Clean and rebuild
-rm -rf dist node_modules
+# Clear npm cache and reinstall
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**3. Build Failures**
+```bash
+# Install build tools
+# Windows: npm install -g windows-build-tools
+# macOS: xcode-select --install
+# Linux: sudo apt install build-essential (Ubuntu/Debian)
+
+# Rebuild native modules
+npm rebuild
+```
+
+**4. Permissions Issues**
+```bash
+# Linux/macOS: Fix permissions
+sudo chown -R $(whoami) ~/.npm
+sudo chown -R $(whoami) /usr/local/lib/node_modules
+
+# Windows: Run as Administrator
+```
+
+### Verification Steps
+```bash
+# 1. Test installation
+npm run test
+
+# 2. Check system status
+claude-kb --status
+
+# 3. Verify Claude Desktop integration
+# Open Claude Desktop and try: "Test knowledge base connection"
+```
+
+## 🔍 Health Check
+
+After installation, run the health check:
+```bash
+# Comprehensive system check
+npm run doctor
+
+# Quick status check
+claude-kb --health
+```
+
+**Expected Output**:
+```
+✅ Node.js version: 20.x.x
+✅ Dependencies: All installed
+✅ Database: Connected
+✅ Claude Desktop: Configured
+✅ NLP Engine: Ready
+✅ Tools Integration: Active
+```
+
+## 🚀 First Use
+
+### Quick Test
+```bash
+# In Claude Desktop, try these commands:
+--- "Load any previous context"
+/search "test" 
+... "Installation successful!"
+/stats
+```
+
+### Complete Setup
+```bash
+# 1. Initialize knowledge base
+--- "Initialize my personal knowledge base"
+
+# 2. Configure preferences
+/config autoSave 5
+/config maxMemoryItems 50000
+
+# 3. Enable integrations
+kb_tool_integration --action=connect --tool=all
+
+# 4. Test marathon mode
+*** "Test marathon mode setup"
+```
+
+## 📊 Performance Optimization
+
+### Recommended Settings
+```bash
+# Configure for your system
+/config maxMemoryItems 50000      # Adjust based on RAM
+/config compressionThreshold 0.8  # Enable compression
+/config autoSave 5                # Auto-save every 5 minutes
+```
+
+### Database Optimization
+```bash
+# Initial database optimization
+npm run vacuum
+npm run migrate
+```
+
+## 🔄 Updating
+
+### Automatic Updates
+```bash
+# Check for updates
+claude-kb --update-check
+
+# Update to latest version
+claude-kb --update
+```
+
+### Manual Updates
+```bash
+# Pull latest changes
+git pull origin main
 npm install
 npm run build
+npm run migrate  # Run database migrations
 ```
 
-### Debugging
+## 📞 Support
 
-Enable verbose logging by adding to your configuration:
+### Getting Help
+- **Documentation**: [docs/](docs/)
+- **Issues**: [GitHub Issues](https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/discussions)
 
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["/path/to/claude-knowledge-base-mcp/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "~/.claude-knowledge-base",
-        "DEBUG": "true"
-      }
-    }
-  }
-}
-```
-
-### Testing MCP Connection
-
-You can test the MCP server directly:
-
+### Diagnostic Information
+If you need support, please include:
 ```bash
-# Test the server
-node dist/server.js
-
-# Should output: "Claude Knowledge Base MCP Server started"
+# Generate diagnostic report
+claude-kb --diagnostics > diagnostic-report.txt
 ```
 
-## Updates
+---
 
-To update to the latest version:
+**🇬🇪 Easy installation guide from Batumi, Georgia 🌊**
 
-```bash
-cd claude-knowledge-base-mcp
-git pull
-npm install
-npm run build
-```
-
-Then restart Claude Desktop.
-
-## Uninstalling
-
-1. Remove the `claude-knowledge-base` entry from `claude_desktop_config.json`
-2. Restart Claude Desktop
-3. Optionally delete the data directory: `rm -rf ~/.claude-knowledge-base`
-4. Delete the cloned repository
-
-## Support
-
-- **Issues:** [GitHub Issues](https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/issues)
-- **Feature Requests:** [GitHub Discussions](https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/discussions)
-- **Documentation:** [Project Wiki](https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/wiki)
+**Made simple for developers worldwide! 🚀**
