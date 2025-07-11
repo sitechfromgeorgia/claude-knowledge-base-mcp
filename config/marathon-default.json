@@ -51,13 +51,12 @@
     }
   },
   "integrations": {
-    "filesystem_enhanced": true,
-    "desktop_commander_enhanced": true,
-    "server_management": true,
+    "auto_discovery": true,
+    "optimization_enabled": true,
     "real_time_monitoring": true,
-    "mcp_auto_sync": true,
     "cross_platform_support": true,
-    "background_processing": true
+    "background_processing": true,
+    "universal_compatibility": true
   },
   "analytics": {
     "performance_tracking": true,
@@ -127,11 +126,10 @@
     "built_with": "Georgian hospitality and technical excellence",
     "location": "Batumi, Georgia 🇬🇪",
     "features": {
-      "acura_server_optimization": true,
-      "econom_server_optimization": true,
       "georgian_language_support": true,
       "batumi_themes": true,
-      "black_sea_metaphors": true
+      "black_sea_metaphors": true,
+      "mountain_endurance_mode": true
     },
     "motivational_messages": [
       "🏔️ Like Georgian mountains - never give up!",
@@ -147,19 +145,8 @@
     "compatibility_check": true,
     "performance_analysis": true,
     "integration_recommendations": true,
-    "supported_categories": {
-      "core": ["claude-knowledge-base", "memory", "sequential-thinking"],
-      "server": ["acura-server", "econom-server", "chrome-puppeteer"],
-      "development": ["github", "filesystem", "desktop-commander"],
-      "business": ["erpnext", "n8n", "gmail"],
-      "external": ["context7-ai", "ottomator"]
-    },
-    "optimization_strategies": {
-      "server_tasks": ["acura-server", "econom-server", "desktop-commander"],
-      "development_workflows": ["github", "filesystem", "n8n-api"],
-      "business_processes": ["erpnext", "gmail-automation", "n8n-workflows"],
-      "ai_enhancement": ["context7-ai", "sequential-thinking", "memory"]
-    }
+    "universal_support": true,
+    "adaptive_categorization": true
   },
   "context_transfer": {
     "enabled": true,
