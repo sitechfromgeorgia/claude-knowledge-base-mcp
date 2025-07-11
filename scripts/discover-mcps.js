@@ -73,59 +73,79 @@ class MCPDiscoveryEngine {
   }
 
   categorizeByName(name) {
-    const categories = {
-      'core': ['claude-knowledge-base', 'memory', 'sequential-thinking'],
-      'server': ['acura-server', 'econom-server', 'chrome-puppeteer'],
-      'development': ['github', 'filesystem', 'desktop-commander'],
-      'business': ['erpnext', 'n8n', 'gmail'],
-      'external': ['context7-ai', 'ottomator']
-    };
-
-    for (const [category, mcps] of Object.entries(categories)) {
-      if (mcps.some(mcp => name.includes(mcp))) {
-        return category;
-      }
+    // General category patterns - adaptable to any MCP
+    if (name.includes('knowledge') || name.includes('memory') || name.includes('thinking')) {
+      return 'core';
     }
+    if (name.includes('server') || name.includes('docker') || name.includes('kubernetes')) {
+      return 'infrastructure';
+    }
+    if (name.includes('github') || name.includes('filesystem') || name.includes('desktop') || name.includes('command')) {
+      return 'development';
+    }
+    if (name.includes('database') || name.includes('sql') || name.includes('postgres') || name.includes('mongo')) {
+      return 'database';
+    }
+    if (name.includes('api') || name.includes('web') || name.includes('http')) {
+      return 'integration';
+    }
+    if (name.includes('ai') || name.includes('ml') || name.includes('context')) {
+      return 'ai-enhancement';
+    }
+    
     return 'custom';
   }
 
   inferCapabilities(name, config) {
     const capabilities = [];
     
-    // Common capability patterns
-    if (name.includes('server')) capabilities.push('infrastructure', 'monitoring');
-    if (name.includes('github')) capabilities.push('version-control', 'collaboration');
-    if (name.includes('filesystem')) capabilities.push('file-operations', 'storage');
-    if (name.includes('desktop')) capabilities.push('system-control', 'automation');
-    if (name.includes('database') || name.includes('sql')) capabilities.push('data-management');
-    if (name.includes('ai') || name.includes('context')) capabilities.push('ai-enhancement');
+    // Infer capabilities from common patterns
+    if (name.includes('server') || name.includes('infrastructure')) {
+      capabilities.push('infrastructure', 'monitoring');
+    }
+    if (name.includes('github') || name.includes('git')) {
+      capabilities.push('version-control', 'collaboration');
+    }
+    if (name.includes('filesystem') || name.includes('file')) {
+      capabilities.push('file-operations', 'storage');
+    }
+    if (name.includes('desktop') || name.includes('command')) {
+      capabilities.push('system-control', 'automation');
+    }
+    if (name.includes('database') || name.includes('sql')) {
+      capabilities.push('data-management');
+    }
+    if (name.includes('ai') || name.includes('context') || name.includes('ml')) {
+      capabilities.push('ai-enhancement');
+    }
+    if (name.includes('api') || name.includes('web')) {
+      capabilities.push('integration', 'communication');
+    }
     
     return capabilities;
   }
 
   calculatePriority(name) {
-    const priorityMap = {
-      'claude-knowledge-base': 10,
-      'memory': 9,
-      'sequential-thinking': 8,
-      'acura-server': 9,
-      'econom-server': 8,
-      'github': 7,
-      'filesystem': 8,
-      'desktop-commander': 7
-    };
-
-    return priorityMap[name] || 5;
+    // Base priority calculation - adaptable
+    if (name.includes('knowledge') || name.includes('memory')) {
+      return 10; // Core functionality
+    }
+    if (name.includes('filesystem') || name.includes('github')) {
+      return 8; // Essential development tools
+    }
+    if (name.includes('server') || name.includes('desktop')) {
+      return 7; // Infrastructure tools
+    }
+    
+    return 5; // Default priority
   }
 
   calculateIntegrationScore(name) {
-    // Georgian excellence boost for our tools! 🇬🇪
-    if (name.includes('acura') || name.includes('econom')) {
-      return 10; // Georgian excellence!
-    }
+    // Base integration scoring
+    const coreTools = ['knowledge', 'memory', 'github', 'filesystem', 'desktop'];
+    const hasCore = coreTools.some(tool => name.includes(tool));
     
-    const coreTools = ['claude-knowledge-base', 'memory', 'github', 'filesystem'];
-    return coreTools.includes(name) ? 9 : 7;
+    return hasCore ? 9 : 7;
   }
 
   generateOptimizationStrategy(mcpProfile) {
@@ -136,22 +156,34 @@ class MCPDiscoveryEngine {
     };
 
     switch (mcpProfile.type) {
-      case 'server':
-        strategy.taskCategories = ['infrastructure', 'deployment', 'monitoring'];
-        strategy.optimalCombinations = ['desktop-commander', 'filesystem'];
+      case 'infrastructure':
+        strategy.taskCategories = ['deployment', 'monitoring', 'scaling'];
+        strategy.optimalCombinations = ['development-tools', 'database-tools'];
         strategy.performanceHints = ['Use for long-running operations', 'Enable background monitoring'];
         break;
         
       case 'development':
         strategy.taskCategories = ['coding', 'version-control', 'file-operations'];
-        strategy.optimalCombinations = ['github', 'filesystem', 'desktop-commander'];
+        strategy.optimalCombinations = ['infrastructure-tools', 'database-tools'];
         strategy.performanceHints = ['Combine with filesystem for complete workflows'];
         break;
         
       case 'core':
         strategy.taskCategories = ['memory', 'analysis', 'persistence'];
-        strategy.optimalCombinations = ['all-mcps'];
+        strategy.optimalCombinations = ['all-categories'];
         strategy.performanceHints = ['Use as foundation for all operations'];
+        break;
+        
+      case 'database':
+        strategy.taskCategories = ['data-management', 'persistence', 'analytics'];
+        strategy.optimalCombinations = ['development-tools', 'infrastructure-tools'];
+        strategy.performanceHints = ['Optimize for data-heavy operations'];
+        break;
+        
+      case 'ai-enhancement':
+        strategy.taskCategories = ['analysis', 'optimization', 'intelligence'];
+        strategy.optimalCombinations = ['core-tools', 'development-tools'];
+        strategy.performanceHints = ['Use for complex decision making'];
         break;
     }
 
@@ -161,7 +193,7 @@ class MCPDiscoveryEngine {
   displayDiscoveryResults() {
     console.log('\n' + boxen(
       chalk.cyan.bold('🏃‍♂️ Marathon MCP Discovery Results\n') +
-      chalk.yellow('🇬🇪 Georgian Excellence Detected!'),
+      chalk.yellow('🇬🇪 Georgian Excellence Activated!'),
       { 
         padding: 1, 
         margin: 1, 
@@ -174,7 +206,7 @@ class MCPDiscoveryEngine {
     const grouped = this.groupByCategory();
     
     for (const [category, mcps] of Object.entries(grouped)) {
-      console.log(chalk.bold.green(`\n✅ ${category.toUpperCase()} SYSTEMS:`));
+      console.log(chalk.bold.green(`\n✅ ${category.toUpperCase()} TOOLS:`));
       
       mcps.forEach(mcp => {
         const score = chalk.yellow(`[${mcp.integrationScore}/10]`);
@@ -203,10 +235,11 @@ class MCPDiscoveryEngine {
     console.log(chalk.bold.blue('\n🎯 OPTIMIZATION STRATEGIES GENERATED:'));
     
     const strategies = {
-      'Server Management': this.getStrategyForType('server'),
+      'Infrastructure Management': this.getStrategyForType('infrastructure'),
       'Development Workflows': this.getStrategyForType('development'),
-      'AI Enhancement': this.getStrategyForType('core'),
-      'Business Processes': this.getStrategyForType('business')
+      'Data Operations': this.getStrategyForType('database'),
+      'AI Enhancement': this.getStrategyForType('ai-enhancement'),
+      'Core Operations': this.getStrategyForType('core')
     };
 
     for (const [strategyName, mcps] of Object.entries(strategies)) {
@@ -216,29 +249,25 @@ class MCPDiscoveryEngine {
       }
     }
 
-    this.displayGeorgianExcellence();
+    this.displayGeorgianMessage();
   }
 
   getStrategyForType(type) {
     return Array.from(this.discoveredMCPs.values()).filter(mcp => mcp.type === type);
   }
 
-  displayGeorgianExcellence() {
-    const georgianMCPs = Array.from(this.discoveredMCPs.values())
-      .filter(mcp => mcp.name.includes('acura') || mcp.name.includes('econom'));
-
-    if (georgianMCPs.length > 0) {
-      console.log('\n' + boxen(
-        chalk.red.bold('🇬🇪 GEORGIAN EXCELLENCE DETECTED! ❤️\n') +
-        chalk.yellow('Special optimization for Georgian-built tools:\n') +
-        georgianMCPs.map(mcp => `- ${chalk.cyan(mcp.name)} (Batumi-grade quality!)`).join('\n'),
-        { 
-          padding: 1, 
-          borderStyle: 'round',
-          borderColor: 'red'
-        }
-      ));
-    }
+  displayGeorgianMessage() {
+    console.log('\n' + boxen(
+      chalk.red.bold('🇬🇪 GEORGIAN EXCELLENCE ACTIVATED! ❤️\n') +
+      chalk.yellow('Marathon MCP Tool intelligently coordinates all your tools\n') +
+      chalk.white('Optimizations tailored to your specific MCP ecosystem\n') +
+      chalk.gray('Built with Black Sea determination and mountain endurance'),
+      { 
+        padding: 1, 
+        borderStyle: 'round',
+        borderColor: 'red'
+      }
+    ));
   }
 
   async generateConfigOptimizations() {
@@ -247,9 +276,8 @@ class MCPDiscoveryEngine {
         auto_discovery: true,
         optimization_strategies: Object.fromEntries(this.optimizationStrategies),
         mcp_profiles: Object.fromEntries(this.discoveredMCPs),
-        georgian_excellence: Array.from(this.discoveredMCPs.values())
-          .filter(mcp => mcp.name.includes('acura') || mcp.name.includes('econom'))
-          .map(mcp => mcp.name)
+        discovered_count: this.discoveredMCPs.size,
+        categories_found: [...new Set(Array.from(this.discoveredMCPs.values()).map(mcp => mcp.type))]
       }
     };
 
@@ -275,7 +303,7 @@ async function main() {
 
   console.log(boxen(
     chalk.blue.bold('🏃‍♂️ Marathon MCP Tool v1.0.1\n') +
-    chalk.yellow('🇬🇪 MCP Discovery Engine\n') +
+    chalk.yellow('🇬🇪 Universal MCP Discovery Engine\n') +
     chalk.gray('Built with Georgian Excellence in Batumi'),
     { 
       padding: 1, 
@@ -294,7 +322,7 @@ async function main() {
     }
     
     console.log(chalk.green.bold('\n🎯 MCP Discovery Complete!'));
-    console.log(chalk.yellow('Ready for Marathon Mode orchestration! 🏃‍♂️'));
+    console.log(chalk.yellow('Ready for intelligent Marathon orchestration! 🏃‍♂️'));
     
   } catch (error) {
     console.error(chalk.red(`\n❌ Discovery failed: ${error.message}`));
