@@ -1,7 +1,7 @@
 {
   "name": "claude-knowledge-base-mcp",
-  "version": "1.0.0",
-  "description": "Advanced Knowledge Management System for Claude Desktop with persistent memory and Marathon Mode",
+  "version": "2.0.0",
+  "description": "Advanced Knowledge Management System for Claude Desktop with persistent memory, Marathon Mode, and sophisticated command syntax",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
@@ -9,8 +9,13 @@
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "test": "vitest",
+    "test:memory": "vitest run src/memory-system.test.ts",
+    "test:integration": "vitest run src/integration.test.ts",
     "lint": "eslint src/**/*.ts",
-    "format": "prettier --write src/**/*.ts"
+    "format": "prettier --write src/**/*.ts",
+    "clean": "rm -rf dist",
+    "prepare": "npm run build",
+    "setup": "node scripts/setup.js"
   },
   "keywords": [
     "claude",
@@ -19,7 +24,10 @@
     "ai-assistant",
     "persistent-memory",
     "marathon-mode",
-    "desktop"
+    "desktop",
+    "vector-search",
+    "knowledge-graph",
+    "automation"
   ],
   "author": "Acura Group",
   "license": "MIT",
@@ -40,6 +48,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.8",
+    "@types/node-cron": "^3.0.11",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",
@@ -53,7 +62,26 @@
   },
   "files": [
     "dist/**/*",
+    "scripts/**/*",
+    "config/**/*",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "bin": {
+    "claude-kb": "./dist/server.js"
+  },
+  "optionalDependencies": {
+    "qdrant-js": "^1.11.0",
+    "chromadb": "^1.8.1",
+    "@pinecone-database/pinecone": "^3.0.0",
+    "@supabase/supabase-js": "^2.45.4"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "n8n-workflow": {
+      "optional": true
+    }
+  }
 }
