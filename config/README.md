@@ -1,315 +1,283 @@
-# Claude Desktop Configuration Examples
+# Claude Knowledge Base MCP v3.0 - Example Configurations
 
-This directory contains configuration examples for different use cases.
+This directory contains example configurations for different use cases and environments.
 
-## Basic Configuration
+## Configuration Files
 
-**File: `~/.config/claude_desktop_config.json` (Linux/Mac)**  
-**File: `%APPDATA%\Claude\claude_desktop_config.json` (Windows)**
+### 1. Basic Configuration (`basic-config.json`)
+Minimal setup for personal use with local storage only.
 
-### Minimal Setup (Local Only)
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["/path/to/claude-knowledge-base-mcp/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "~/.claude-knowledge-base"
-      }
-    }
-  }
-}
-```
+### 2. Development Configuration (`development-config.json`)
+Enhanced setup for development work with full tool integration and debugging.
 
-### Standard Setup with Marathon Mode
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["/path/to/claude-knowledge-base-mcp/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "~/.claude-knowledge-base",
-        "KB_AUTO_SAVE_INTERVAL": "5",
-        "KB_MARATHON_ENABLED": "true",
-        "KB_MAX_CONTEXT_SIZE": "100000",
-        "KB_CONTEXT_OVERFLOW_THRESHOLD": "80000"
-      }
-    }
-  }
-}
-```
+### 3. Production Configuration (`production-config.json`)
+Optimized setup for production environments with performance monitoring.
 
-### Advanced Setup with Optional Integrations
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["/path/to/claude-knowledge-base-mcp/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "~/.claude-knowledge-base",
-        "KB_AUTO_SAVE_INTERVAL": "3",
-        "KB_MARATHON_ENABLED": "true",
-        "KB_MAX_CONTEXT_SIZE": "150000",
-        "KB_VECTOR_DIMENSION": "384",
-        "KB_MAX_MEMORY_ITEMS": "20000",
-        "KB_COMPRESSION_THRESHOLD": "0.7",
-        "KB_VECTOR_DB": "qdrant",
-        "KB_QDRANT_URL": "http://localhost:6333",
-        "KB_STORAGE": "supabase",
-        "KB_SUPABASE_URL": "https://your-project.supabase.co",
-        "KB_SUPABASE_ANON_KEY": "your-anon-key",
-        "KB_WORKFLOWS": "n8n",
-        "KB_N8N_URL": "http://localhost:5678",
-        "KB_N8N_API_KEY": "your-n8n-api-key"
-      }
-    }
-  }
-}
-```
+### 4. Claude Desktop Configurations
+- `claude-desktop-basic.json` - Basic Claude Desktop setup
+- `claude-desktop-advanced.json` - Advanced setup with all features
+- `claude-desktop-development.json` - Development-specific setup
 
-## Environment Variables Reference
+## Environment Variables
 
 ### Core Settings
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `KB_DATA_DIR` | `~/.claude-knowledge-base` | Data storage directory |
-| `KB_AUTO_SAVE_INTERVAL` | `5` | Auto-save interval in minutes |
-| `KB_MARATHON_ENABLED` | `true` | Enable Marathon Mode |
-| `KB_MAX_CONTEXT_SIZE` | `100000` | Maximum context size before overflow |
-| `KB_CONTEXT_OVERFLOW_THRESHOLD` | `80000` | Context size to trigger transfer |
-
-### Memory Settings
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `KB_VECTOR_DIMENSION` | `100` | Vector embedding dimensions |
-| `KB_MAX_MEMORY_ITEMS` | `10000` | Maximum stored memory items |
-| `KB_COMPRESSION_THRESHOLD` | `0.8` | Context compression trigger |
-
-### Optional Integrations
-
-#### Vector Database
-| Variable | Options | Description |
-|----------|---------|-------------|
-| `KB_VECTOR_DB` | `local`, `qdrant`, `chroma`, `pinecone` | Vector database type |
-| `KB_QDRANT_URL` | - | Qdrant server URL |
-| `KB_QDRANT_API_KEY` | - | Qdrant API key (if required) |
-| `KB_CHROMA_URL` | - | ChromaDB server URL |
-| `KB_PINECONE_API_KEY` | - | Pinecone API key |
-| `KB_PINECONE_ENVIRONMENT` | - | Pinecone environment |
-
-#### Storage Backend
-| Variable | Options | Description |
-|----------|---------|-------------|
-| `KB_STORAGE` | `local`, `supabase`, `s3` | Storage backend |
-| `KB_SUPABASE_URL` | - | Supabase project URL |
-| `KB_SUPABASE_ANON_KEY` | - | Supabase anonymous key |
-| `KB_AWS_ACCESS_KEY_ID` | - | AWS access key |
-| `KB_AWS_SECRET_ACCESS_KEY` | - | AWS secret key |
-| `KB_AWS_REGION` | - | AWS region |
-| `KB_S3_BUCKET` | - | S3 bucket name |
-
-#### Workflow Integration
-| Variable | Options | Description |
-|----------|---------|-------------|
-| `KB_WORKFLOWS` | `none`, `n8n`, `zapier` | Workflow engine |
-| `KB_N8N_URL` | - | n8n server URL |
-| `KB_N8N_API_KEY` | - | n8n API key |
-| `KB_ZAPIER_API_KEY` | - | Zapier API key |
-
-## Platform-Specific Setup
-
-### macOS
 ```bash
-# Claude Desktop config location
-~/.config/claude_desktop_config.json
-
-# Example installation path
-/Applications/Claude.app/Contents/Resources/claude_desktop_config.json
+KB_DATA_DIR="/path/to/data"                    # Data storage directory
+KB_AUTO_SAVE_INTERVAL="5"                     # Auto-save interval (minutes)
+KB_MARATHON_ENABLED="true"                    # Enable Marathon Mode
+KB_MAX_CONTEXT_SIZE="100000"                  # Context overflow threshold
 ```
 
-### Windows
-```powershell
-# Claude Desktop config location
-%APPDATA%\Claude\claude_desktop_config.json
-
-# Example with Windows paths
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["C:\\Users\\Username\\claude-knowledge-base-mcp\\dist\\server.js"],
-      "env": {
-        "KB_DATA_DIR": "C:\\Users\\Username\\.claude-knowledge-base"
-      }
-    }
-  }
-}
-```
-
-### Linux
+### NLP Settings
 ```bash
-# Claude Desktop config location
-~/.config/claude_desktop_config.json
-
-# Set proper permissions
-chmod 600 ~/.config/claude_desktop_config.json
+KB_VECTOR_DIMENSION="300"                     # Embedding dimensions (100-500)
+KB_ENABLE_STEMMING="true"                     # Enable word stemming
+KB_REMOVE_STOPWORDS="true"                    # Remove stopwords
+KB_CACHE_SIZE="10000"                         # NLP cache size
+KB_NLP_LANGUAGE="en"                          # Language (en, es, fr, de, etc.)
 ```
 
-## Development Configuration
+### Performance Settings
+```bash
+KB_MAX_MEMORY_ITEMS="50000"                   # Maximum stored memories
+KB_COMPRESSION_THRESHOLD="0.8"                # Context compression trigger
+KB_PERFORMANCE_MONITORING="true"              # Enable performance tracking
+KB_ANALYTICS_ENABLED="true"                   # Enable analytics
+```
 
-### With tsx for Development
+### Tool Integration
+```bash
+KB_TOOL_INTEGRATION="true"                    # Enable tool integration
+KB_FILE_WATCHING="true"                       # Enable file watching
+KB_INTEGRATION_SYNC_INTERVAL="30"             # Sync interval (seconds)
+KB_DESKTOP_COMMANDER_ENABLED="true"           # Enable Desktop Commander integration
+KB_GITHUB_INTEGRATION="true"                  # Enable GitHub integration
+KB_FILESYSTEM_INTEGRATION="true"              # Enable Filesystem integration
+```
+
+### Security & Privacy
+```bash
+KB_ENCRYPT_SENSITIVE_DATA="false"             # Encrypt sensitive data
+KB_DATA_RETENTION_DAYS="365"                  # Data retention (days)
+KB_AUDIT_LOGGING="true"                       # Enable audit logging
+KB_BACKUP_ENABLED="true"                      # Enable automatic backups
+KB_BACKUP_INTERVAL="24"                       # Backup interval (hours)
+```
+
+### Development & Debugging
+```bash
+KB_LOG_LEVEL="info"                           # Log level (debug, info, warn, error)
+KB_DEBUG_MODE="false"                         # Enable debug mode
+KB_ENABLE_BENCHMARKING="false"                # Enable performance benchmarking
+KB_VERBOSE_LOGGING="false"                    # Enable verbose logging
+```
+
+## Configuration Examples by Use Case
+
+### Personal Knowledge Management
 ```json
 {
-  "mcpServers": {
-    "claude-knowledge-base-dev": {
-      "command": "npx",
-      "args": ["tsx", "src/server.ts"],
-      "cwd": "/path/to/claude-knowledge-base-mcp",
-      "env": {
-        "NODE_ENV": "development",
-        "KB_DATA_DIR": "./dev-data",
-        "KB_AUTO_SAVE_INTERVAL": "1",
-        "KB_MARATHON_ENABLED": "true"
-      }
-    }
+  "dataDir": "~/.claude-knowledge-base",
+  "maxContextSize": 50000,
+  "autoSaveInterval": 10,
+  "vectorDimension": 200,
+  "maxMemoryItems": 10000,
+  "marathonEnabled": true,
+  "integrations": {
+    "desktopCommander": false,
+    "github": false,
+    "filesystem": true
+  },
+  "performance": {
+    "monitoring": false,
+    "analytics": true,
+    "recommendations": true
   }
 }
 ```
 
-### Multiple Instances
+### Software Development
 ```json
 {
-  "mcpServers": {
-    "claude-kb-personal": {
-      "command": "node",
-      "args": ["/path/to/claude-knowledge-base-mcp/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "~/.claude-kb-personal"
-      }
-    },
-    "claude-kb-work": {
-      "command": "node", 
-      "args": ["/path/to/claude-knowledge-base-mcp/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "~/work/.claude-kb-work",
-        "KB_MAX_MEMORY_ITEMS": "50000"
-      }
-    }
+  "dataDir": "~/dev/.claude-knowledge-base",
+  "maxContextSize": 100000,
+  "autoSaveInterval": 3,
+  "vectorDimension": 300,
+  "maxMemoryItems": 50000,
+  "marathonEnabled": true,
+  "integrations": {
+    "desktopCommander": true,
+    "github": true,
+    "filesystem": true
+  },
+  "performance": {
+    "monitoring": true,
+    "analytics": true,
+    "recommendations": true
   }
 }
 ```
 
-## Troubleshooting
+### Research & Analysis
+```json
+{
+  "dataDir": "~/research/.claude-knowledge-base",
+  "maxContextSize": 150000,
+  "autoSaveInterval": 5,
+  "vectorDimension": 400,
+  "maxMemoryItems": 100000,
+  "marathonEnabled": true,
+  "nlpSettings": {
+    "enableStemming": true,
+    "removeStopwords": true,
+    "language": "en",
+    "cacheSize": 20000
+  },
+  "integrations": {
+    "desktopCommander": true,
+    "github": false,
+    "filesystem": true
+  }
+}
+```
+
+### Team Collaboration
+```json
+{
+  "dataDir": "/shared/.claude-knowledge-base",
+  "maxContextSize": 200000,
+  "autoSaveInterval": 2,
+  "vectorDimension": 300,
+  "maxMemoryItems": 200000,
+  "marathonEnabled": true,
+  "security": {
+    "encryptSensitiveData": true,
+    "dataRetentionDays": 90,
+    "auditLogging": true
+  },
+  "performance": {
+    "monitoring": true,
+    "analytics": true,
+    "recommendations": true
+  }
+}
+```
+
+## Quick Setup Commands
+
+### Basic Setup
+```bash
+npm install
+npm run build
+npm run setup
+```
+
+### Development Setup
+```bash
+npm install
+npm run build
+KB_DEBUG_MODE=true KB_VERBOSE_LOGGING=true npm run setup
+```
+
+### Custom Data Directory
+```bash
+KB_DATA_DIR="/custom/path" npm run setup
+```
+
+### Environment-Specific Setup
+```bash
+# Development
+NODE_ENV=development npm run setup
+
+# Production
+NODE_ENV=production npm run setup
+```
+
+## Troubleshooting Configuration
 
 ### Common Issues
 
-**1. Permission Denied**
+1. **Permission Errors**
+   ```bash
+   sudo chown -R $USER:$USER ~/.claude-knowledge-base
+   chmod 755 ~/.claude-knowledge-base
+   ```
+
+2. **SQLite Errors**
+   ```bash
+   # Clear and reinitialize database
+   rm ~/.claude-knowledge-base/knowledge-base.db
+   npm run setup
+   ```
+
+3. **NLP Performance Issues**
+   ```bash
+   # Reduce vector dimensions for better performance
+   KB_VECTOR_DIMENSION=100 npm run setup
+   ```
+
+4. **Memory Issues**
+   ```bash
+   # Reduce cache size and memory limits
+   KB_CACHE_SIZE=5000 KB_MAX_MEMORY_ITEMS=10000 npm run setup
+   ```
+
+### Performance Optimization
+
+1. **For Low-End Systems**
+   ```json
+   {
+     "vectorDimension": 100,
+     "maxMemoryItems": 5000,
+     "nlpSettings": {
+       "cacheSize": 2000
+     },
+     "performance": {
+       "monitoring": false
+     }
+   }
+   ```
+
+2. **For High-End Systems**
+   ```json
+   {
+     "vectorDimension": 500,
+     "maxMemoryItems": 100000,
+     "nlpSettings": {
+       "cacheSize": 50000
+     },
+     "performance": {
+       "monitoring": true,
+       "analytics": true
+     }
+   }
+   ```
+
+## Migration from Previous Versions
+
+### From v2.0 to v3.0
 ```bash
-# Fix file permissions
-chmod +x /path/to/claude-knowledge-base-mcp/dist/server.js
+# Backup existing data
+cp -r ~/.claude-knowledge-base ~/.claude-knowledge-base-v2-backup
+
+# Run migration
+npm run migrate
+
+# Verify migration
+npm run stats
 ```
 
-**2. Node.js Path Issues**
-```json
-{
-  "command": "/usr/local/bin/node",
-  "args": ["/absolute/path/to/dist/server.js"]
-}
-```
+### Configuration Migration
+v3.0 introduces new configuration options. The migration script will:
+1. Preserve all existing memories and sessions
+2. Convert old configuration format to new format
+3. Add new default settings for v3.0 features
+4. Create backup of old configuration
 
-**3. Data Directory Creation**
-```bash
-# Ensure directory exists
-mkdir -p ~/.claude-knowledge-base
-chmod 755 ~/.claude-knowledge-base
-```
+## Support
 
-### Debug Configuration
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["--inspect", "/path/to/dist/server.js"],
-      "env": {
-        "NODE_ENV": "development",
-        "DEBUG": "claude-kb:*",
-        "KB_LOG_LEVEL": "debug"
-      }
-    }
-  }
-}
-```
-
-## Performance Tuning
-
-### High-Performance Setup
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["--max-old-space-size=4096", "/path/to/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "/fast-ssd/.claude-knowledge-base",
-        "KB_MAX_MEMORY_ITEMS": "100000",
-        "KB_VECTOR_DIMENSION": "384",
-        "KB_AUTO_SAVE_INTERVAL": "2",
-        "KB_COMPRESSION_THRESHOLD": "0.6"
-      }
-    }
-  }
-}
-```
-
-### Low-Resource Setup
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["--max-old-space-size=512", "/path/to/dist/server.js"],
-      "env": {
-        "KB_MAX_MEMORY_ITEMS": "1000",
-        "KB_VECTOR_DIMENSION": "50",
-        "KB_AUTO_SAVE_INTERVAL": "10",
-        "KB_COMPRESSION_THRESHOLD": "0.9"
-      }
-    }
-  }
-}
-```
-
-## Security Considerations
-
-### Secure Configuration
-```json
-{
-  "mcpServers": {
-    "claude-knowledge-base": {
-      "command": "node",
-      "args": ["/path/to/dist/server.js"],
-      "env": {
-        "KB_DATA_DIR": "~/.claude-knowledge-base",
-        "KB_ENABLE_ENCRYPTION": "true",
-        "KB_ENCRYPTION_KEY": "your-32-character-encryption-key",
-        "KB_AUDIT_LOG": "true",
-        "KB_MAX_SESSIONS": "10"
-      }
-    }
-  }
-}
-```
-
-### File Permissions
-```bash
-# Secure data directory
-chmod 700 ~/.claude-knowledge-base
-chmod 600 ~/.claude-knowledge-base/*
-
-# Secure config file
-chmod 600 ~/.config/claude_desktop_config.json
-```
+For configuration help:
+1. Check the logs: `tail -f ~/.claude-knowledge-base/logs/application.log`
+2. Run diagnostics: `npm run test:integration`
+3. Reset configuration: `npm run setup` (with backup)
+4. GitHub Issues: https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/issues
