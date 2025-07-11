@@ -8,7 +8,7 @@
   "city": "Batumi 🌊",
   "documentation": {
     "readme": "README.md",
-    "installation": "docs/installation.md",
+    "installation": "INSTALL.md",
     "examples": "docs/examples.md", 
     "api": "docs/api.md",
     "troubleshooting": "docs/troubleshooting.md",
@@ -23,7 +23,10 @@
     "🔌 Tool Integration (Desktop Commander, GitHub, Filesystem)",
     "📱 Dual command syntax (Symbol + Slash commands)",
     "📊 Real-time analytics and performance monitoring", 
-    "🔒 Complete privacy with offline operation"
+    "🔒 Complete privacy with offline operation",
+    "🛠️ Cross-platform compatibility (Windows, macOS, Linux)",
+    "⚡ One-line installation with auto-setup",
+    "🩺 Built-in system diagnostics and health checks"
   ],
   "tools": [
     {
@@ -45,12 +48,12 @@
       ]
     },
     {
-      "name": "kb_marathon_mode",
+      "name": "kb_marathon_manager",
       "description": "Marathon Mode with auto-save and context transfer",
       "parameters": ["action", "task", "options"],
       "examples": [
-        "kb_marathon_mode --action=start --task=\"Setup CI/CD pipeline\"",
-        "kb_marathon_mode --action=checkpoint --description=\"Database setup complete\""
+        "kb_marathon_manager --action=start --task=\"Setup CI/CD pipeline\"",
+        "kb_marathon_manager --action=checkpoint --description=\"Database setup complete\""
       ]
     },
     {
@@ -97,26 +100,37 @@
       "npm": ">=8.0.0",
       "platforms": ["Windows", "macOS", "Linux"]
     },
-    "steps": [
+    "quick_install": [
+      "npx claude-knowledge-base-setup",
       "git clone https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp.git",
       "cd claude-knowledge-base-mcp", 
       "npm install",
       "npm run build",
       "npm run setup"
     ],
-    "auto_installer": "curl -sSL https://install.claude-kb.acura.ge | bash"
+    "auto_installer": "curl -sSL https://install.claude-kb.acura.ge | bash",
+    "diagnostic": "npm run doctor"
   },
   "performance": {
     "embedding_generation": "<50ms",
     "semantic_search": "<100ms for 10,000 items",
     "context_loading": "200-500ms", 
     "memory_usage": "~50MB base + ~1KB per item",
-    "database_search": "<20ms for millions of records"
+    "database_search": "<20ms for millions of records",
+    "cross_platform": "Optimized for Windows, macOS, Linux"
   },
   "support": {
     "issues": "https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/issues",
     "discussions": "https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/discussions",
     "documentation": "https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/wiki",
-    "email": "info@acura.ge"
+    "email": "info@acura.ge",
+    "diagnostics": "npm run doctor"
+  },
+  "fixes_applied": {
+    "dependencies": "Fixed stopwords->stopword, sqlite3 cross-platform compatibility",
+    "installation": "Added auto-setup scripts and cross-platform support",
+    "documentation": "Created comprehensive docs/ structure for MCP remote",
+    "diagnostics": "Added system doctor for health checks",
+    "mcp_integration": "Enhanced .mcp metadata for remote compatibility"
   }
 }
