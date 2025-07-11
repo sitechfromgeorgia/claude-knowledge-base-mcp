@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "claude-knowledge-base": {
+      "command": "node",
+      "args": ["path/to/claude-knowledge-base-mcp/dist/server-v3.js"],
+      "env": {
+        "KB_DATA_DIR": "~/.claude-knowledge-base",
+        "KB_AUTO_SAVE_INTERVAL": "5",
+        "KB_MARATHON_ENABLED": "true",
+        "KB_MAX_CONTEXT_SIZE": "100000",
+        "KB_VECTOR_DIMENSION": "300",
+        "KB_MAX_MEMORY_ITEMS": "50000",
+        "KB_TOOL_INTEGRATION": "true",
+        "KB_PERFORMANCE_MONITORING": "true",
+        "KB_ENABLE_STEMMING": "true",
+        "KB_REMOVE_STOPWORDS": "true",
+        "KB_CACHE_SIZE": "10000",
+        "KB_FILE_WATCHING": "true",
+        "KB_DESKTOP_COMMANDER_ENABLED": "true",
+        "KB_GITHUB_INTEGRATION": "true",
+        "KB_FILESYSTEM_INTEGRATION": "true",
+        "KB_ANALYTICS_ENABLED": "true",
+        "KB_BACKUP_ENABLED": "true",
+        "KB_LOG_LEVEL": "info"
+      }
+    }
+  }
+}
