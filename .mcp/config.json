@@ -1,0 +1,122 @@
+{
+  "name": "claude-knowledge-base-mcp",
+  "version": "3.0.1",
+  "description": "🇬🇪 Advanced Local Knowledge Management System for Claude Desktop - Built with Love from Georgia, Batumi ❤️",
+  "category": "knowledge-management",
+  "icon": "🧠",
+  "country": "Georgia 🇬🇪", 
+  "city": "Batumi 🌊",
+  "documentation": {
+    "readme": "README.md",
+    "installation": "docs/installation.md",
+    "examples": "docs/examples.md", 
+    "api": "docs/api.md",
+    "troubleshooting": "docs/troubleshooting.md",
+    "changelog": "CHANGELOG.md"
+  },
+  "features": [
+    "🧠 SQLite Database with FTS5 full-text search",
+    "🚀 Local NLP processing - No external APIs required", 
+    "⚡ Semantic Search with 300-dimensional embeddings",
+    "🔗 Knowledge Graph with relationship tracking",
+    "🏃‍♂️ Marathon Mode 2.0 with auto-save and transfer",
+    "🔌 Tool Integration (Desktop Commander, GitHub, Filesystem)",
+    "📱 Dual command syntax (Symbol + Slash commands)",
+    "📊 Real-time analytics and performance monitoring", 
+    "🔒 Complete privacy with offline operation"
+  ],
+  "tools": [
+    {
+      "name": "kb_context_manager",
+      "description": "Advanced context management with semantic analysis",
+      "parameters": ["action", "query", "options"],
+      "examples": [
+        "kb_context_manager --action=load --query=\"deployment issues\"",
+        "kb_context_manager --action=save --data='{\"progress\":\"API deployed\"}'"
+      ]
+    },
+    {
+      "name": "kb_semantic_search", 
+      "description": "Semantic search with advanced NLP",
+      "parameters": ["query", "options"],
+      "examples": [
+        "kb_semantic_search --query=\"database performance issues\"",
+        "kb_semantic_search --query=\"authentication bugs\" --threshold=0.7"
+      ]
+    },
+    {
+      "name": "kb_marathon_mode",
+      "description": "Marathon Mode with auto-save and context transfer",
+      "parameters": ["action", "task", "options"],
+      "examples": [
+        "kb_marathon_mode --action=start --task=\"Setup CI/CD pipeline\"",
+        "kb_marathon_mode --action=checkpoint --description=\"Database setup complete\""
+      ]
+    },
+    {
+      "name": "kb_tool_integration",
+      "description": "Seamless integration with other MCP tools", 
+      "parameters": ["action", "tool", "command", "parameters"],
+      "examples": [
+        "kb_tool_integration --action=execute --tool=desktop-commander --command=\"ls -la\"",
+        "kb_tool_integration --action=sync --tool=github"
+      ]
+    },
+    {
+      "name": "kb_analytics",
+      "description": "Real-time performance and usage analytics",
+      "parameters": ["type", "timeRange", "detailed"],
+      "examples": [
+        "kb_analytics --type=performance --timeRange=1d",
+        "kb_analytics --type=memory --detailed=true"
+      ]
+    }
+  ],
+  "commands": {
+    "symbol_syntax": {
+      "---": "Load context with tool integration awareness",
+      "+++": "Execute task with smart tool selection", 
+      "...": "Save progress with semantic analysis",
+      "***": "Marathon Mode with tool state preservation"
+    },
+    "slash_syntax": {
+      "/search": "Advanced semantic search with filters",
+      "/deploy": "Deployment with memory tracking",
+      "/save": "Intelligent progress saving with categorization", 
+      "/load": "Context loading with integration data",
+      "/marathon": "Marathon Mode management",
+      "/execute": "Complex task execution with tool chaining",
+      "/config": "Configuration management",
+      "/stats": "System analytics and insights",
+      "/help": "Interactive help system"
+    }
+  },
+  "installation": {
+    "requirements": {
+      "node": ">=18.0.0",
+      "npm": ">=8.0.0",
+      "platforms": ["Windows", "macOS", "Linux"]
+    },
+    "steps": [
+      "git clone https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp.git",
+      "cd claude-knowledge-base-mcp", 
+      "npm install",
+      "npm run build",
+      "npm run setup"
+    ],
+    "auto_installer": "curl -sSL https://install.claude-kb.acura.ge | bash"
+  },
+  "performance": {
+    "embedding_generation": "<50ms",
+    "semantic_search": "<100ms for 10,000 items",
+    "context_loading": "200-500ms", 
+    "memory_usage": "~50MB base + ~1KB per item",
+    "database_search": "<20ms for millions of records"
+  },
+  "support": {
+    "issues": "https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/issues",
+    "discussions": "https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/discussions",
+    "documentation": "https://github.com/sitechfromgeorgia/claude-knowledge-base-mcp/wiki",
+    "email": "info@acura.ge"
+  }
+}
