@@ -1,0 +1,222 @@
+{
+  "marathon": {
+    "version": "1.0.1",
+    "codename": "Georgian Excellence",
+    "mode": "foundation",
+    "auto_discovery": true,
+    "context_management": {
+      "overflow_threshold": 80000,
+      "auto_transfer": true,
+      "compression_enabled": true,
+      "checkpoint_interval": 5,
+      "smart_overflow_detection": true,
+      "preservation_strategy": "intelligent"
+    },
+    "project_orchestration": {
+      "ai_planning": true,
+      "parallel_execution": true,
+      "dependency_management": true,
+      "resource_optimization": true,
+      "risk_assessment": true,
+      "completion_forecasting": true
+    },
+    "intelligent_features": {
+      "mcp_auto_discovery": true,
+      "smart_mcp_selection": true,
+      "optimization_suggestions": true,
+      "predictive_analysis": true,
+      "learning_enabled": true
+    }
+  },
+  "security": {
+    "audit_logging": true,
+    "command_validation": true,
+    "directory_restrictions": true,
+    "encryption": {
+      "sensitive_data": true,
+      "state_serialization": true,
+      "algorithm": "AES-256-GCM"
+    },
+    "access_control": {
+      "role_based": false,
+      "permission_enforcement": true,
+      "command_whitelist": true,
+      "dangerous_command_protection": true
+    },
+    "compliance": {
+      "gdpr_compliant": true,
+      "data_retention_days": 90,
+      "audit_trail_retention": 365,
+      "privacy_first": true
+    }
+  },
+  "integrations": {
+    "filesystem_enhanced": true,
+    "desktop_commander_enhanced": true,
+    "server_management": true,
+    "real_time_monitoring": true,
+    "mcp_auto_sync": true,
+    "cross_platform_support": true,
+    "background_processing": true
+  },
+  "analytics": {
+    "performance_tracking": true,
+    "usage_analytics": true,
+    "optimization_suggestions": true,
+    "predictive_analysis": true,
+    "success_metrics": true,
+    "error_tracking": true,
+    "resource_monitoring": true,
+    "privacy": {
+      "anonymize_data": true,
+      "local_only": true,
+      "no_external_transmission": true
+    }
+  },
+  "user_experience": {
+    "mode": "adaptive",
+    "confirmations": "smart",
+    "explanations": "contextual",
+    "error_handling": "guided",
+    "learning_enabled": true,
+    "progressive_disclosure": true,
+    "experience_levels": {
+      "novice": {
+        "confirmations": "all",
+        "explanations": "detailed",
+        "suggestions": "proactive",
+        "error_handling": "guided"
+      },
+      "standard": {
+        "confirmations": "critical",
+        "explanations": "contextual",
+        "suggestions": "smart",
+        "error_handling": "assisted"
+      },
+      "expert": {
+        "confirmations": "minimal",
+        "explanations": "on_demand",
+        "suggestions": "subtle",
+        "error_handling": "efficient"
+      }
+    }
+  },
+  "performance": {
+    "optimization": {
+      "auto_optimize": true,
+      "resource_monitoring": true,
+      "cache_management": true,
+      "memory_optimization": true
+    },
+    "thresholds": {
+      "max_memory_usage": "2GB",
+      "max_context_size": 100000,
+      "checkpoint_interval_minutes": 5,
+      "auto_cleanup_days": 30
+    },
+    "monitoring": {
+      "real_time": true,
+      "performance_alerts": true,
+      "resource_warnings": true,
+      "optimization_suggestions": true
+    }
+  },
+  "georgian_excellence": {
+    "enabled": true,
+    "inspiration": "Black Sea coastal innovation",
+    "built_with": "Georgian hospitality and technical excellence",
+    "location": "Batumi, Georgia 🇬🇪",
+    "features": {
+      "acura_server_optimization": true,
+      "econom_server_optimization": true,
+      "georgian_language_support": true,
+      "batumi_themes": true,
+      "black_sea_metaphors": true
+    },
+    "motivational_messages": [
+      "🏔️ Like Georgian mountains - never give up!",
+      "🌊 Like the Black Sea - adapt to any challenge!",
+      "❤️ Built with Georgian hospitality!",
+      "🚀 Batumi innovation at its finest!",
+      "🇬🇪 საქართველოდან სიყვარულით!"
+    ]
+  },
+  "mcp_discovery": {
+    "auto_scan": true,
+    "optimization": true,
+    "compatibility_check": true,
+    "performance_analysis": true,
+    "integration_recommendations": true,
+    "supported_categories": {
+      "core": ["claude-knowledge-base", "memory", "sequential-thinking"],
+      "server": ["acura-server", "econom-server", "chrome-puppeteer"],
+      "development": ["github", "filesystem", "desktop-commander"],
+      "business": ["erpnext", "n8n", "gmail"],
+      "external": ["context7-ai", "ottomator"]
+    },
+    "optimization_strategies": {
+      "server_tasks": ["acura-server", "econom-server", "desktop-commander"],
+      "development_workflows": ["github", "filesystem", "n8n-api"],
+      "business_processes": ["erpnext", "gmail-automation", "n8n-workflows"],
+      "ai_enhancement": ["context7-ai", "sequential-thinking", "memory"]
+    }
+  },
+  "context_transfer": {
+    "enabled": true,
+    "auto_detection": true,
+    "smart_compression": true,
+    "state_preservation": true,
+    "verification_enabled": true,
+    "transfer_strategies": {
+      "essential_context_extraction": true,
+      "mcp_state_serialization": true,
+      "project_state_capture": true,
+      "continuation_prompt_generation": true
+    }
+  },
+  "marathon_mode": {
+    "auto_checkpoint": true,
+    "checkpoint_interval": 5,
+    "context_overflow_protection": true,
+    "tool_state_preservation": true,
+    "error_recovery": true,
+    "progress_tracking": true,
+    "success_metrics": true,
+    "adaptive_optimization": true
+  },
+  "enterprise_features": {
+    "available": true,
+    "multi_user_support": false,
+    "sso_integration": false,
+    "advanced_audit": true,
+    "compliance_reporting": true,
+    "role_based_access": false,
+    "enterprise_security": true
+  },
+  "development": {
+    "debug_mode": false,
+    "verbose_logging": false,
+    "performance_profiling": false,
+    "feature_flags": {
+      "experimental_features": false,
+      "beta_features": true,
+      "advanced_analytics": true
+    }
+  },
+  "backup": {
+    "auto_backup": true,
+    "backup_interval": "daily",
+    "retention_days": 30,
+    "compression": true,
+    "encryption": true,
+    "verification": true
+  },
+  "notifications": {
+    "enabled": true,
+    "success_messages": true,
+    "error_alerts": true,
+    "progress_updates": true,
+    "optimization_suggestions": true,
+    "georgian_motivational": true
+  }
+}
