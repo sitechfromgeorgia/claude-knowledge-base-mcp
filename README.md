@@ -39,39 +39,47 @@ Transform your Claude Desktop into the most powerful AI Project Orchestrator ava
 - **Data Encryption**: Sensitive information protection
 
 ### 🔌 **Unified Tool Integration**
-- **Filesystem++**: Enhanced with security and versioning
-- **Desktop Commander++**: Background tasks and monitoring
+- **Enhanced Filesystem**: Security, versioning, and cross-platform support
+- **Advanced Desktop Commander**: Background tasks and system monitoring
 - **Server Management**: Cross-platform infrastructure control
 - **Real-time Monitoring**: System health and performance tracking
 
 ---
 
-## 🏗️ Your Detected MCP Ecosystem
+## 🏗️ Universal MCP Integration
 
-Marathon MCP Tool automatically discovers and optimizes your installed MCPs:
+Marathon MCP Tool automatically discovers and optimizes ANY installed MCP, creating intelligent coordination strategies:
 
-### **Core Systems**
-- `claude-knowledge-base` - Persistent memory and analytics
-- `memory` - Enhanced knowledge graph operations
-- `sequential-thinking` - AI-powered reasoning chains
+### **Common MCP Categories**
+- **Core Systems**: Memory, knowledge management, AI reasoning tools
+- **Development Tools**: GitHub, filesystem, command execution
+- **Infrastructure**: Server management, containerization, monitoring
+- **Database**: SQL, NoSQL, data management systems
+- **Integration**: APIs, webhooks, external services
+- **AI Enhancement**: Context analysis, optimization, intelligence
 
-### **Server Management**
-- `acura-server` - Production infrastructure control
-- `econom-server` - Business platform management
-- `chrome-puppeteer` - Web automation and monitoring
+### **Auto-Discovery Process**
+```
+🔍 MCP Discovery Example:
 
-### **Development Tools**
-- `github` - Version control and collaboration
-- `filesystem` - Enhanced file operations with security
-- `desktop-commander` - System control and automation
+✅ CORE TOOLS:
+  - your-knowledge-system [9/10] memory, persistence
+  - reasoning-engine [8/10] analysis, thinking
 
-### **Business Tools**
-- `erpnext-mcp` - Business process management
-- `n8n-integrations` - Workflow automation
+✅ DEVELOPMENT TOOLS:
+  - github-integration [7/10] version-control, collaboration
+  - filesystem-manager [8/10] file-operations, storage
+  - desktop-controller [7/10] system-control, automation
 
-### **External Integrations**
-- `context7-ai` - Advanced AI capabilities
-- Various specialized MCPs for your workflow
+✅ INFRASTRUCTURE TOOLS:
+  - server-manager [8/10] infrastructure, monitoring
+  - database-connector [7/10] data-management
+
+🎯 Optimization Strategies Generated:
+- Development Workflows: github + filesystem + desktop
+- Infrastructure Management: server + database + monitoring
+- AI Enhancement: knowledge + reasoning + context
+```
 
 ---
 
@@ -113,7 +121,7 @@ When your context approaches limits, Marathon automatically:
 "Continue Marathon session: [SERIALIZED_STATE] 
 Current progress: Database setup 80% complete
 Next actions: Configure monitoring and deploy to production
-MCP states preserved: github, acura-server, filesystem"
+MCP states preserved: github✓ filesystem✓ server-tools✓"
 ```
 
 ---
@@ -207,9 +215,9 @@ kb_security_audit --comprehensive=true
 
 ```bash
 +++ Setup complete production infrastructure including:
-- Supabase database with authentication
-- Docker containers for microservices  
-- GitHub CI/CD pipeline with testing
+- Database with authentication
+- Container orchestration
+- CI/CD pipeline with testing
 - Monitoring stack with alerts
 - Security scanning and compliance checks
 ```
@@ -222,11 +230,11 @@ kb_security_audit --comprehensive=true
 📋 PROJECT ANALYSIS:
 - Complexity: HIGH (Multi-service architecture)
 - Duration: 4-6 hours estimated
-- Required MCPs: acura-server, github, desktop-commander, filesystem
+- Required MCPs: server-management, github, desktop-tools, filesystem
 - Risk Assessment: MEDIUM (managed with automated checkpoints)
 
 🎯 EXECUTION STRATEGY:
-Phase 1: Supabase setup (45 mins) → Using database integrations
+Phase 1: Database setup (45 mins) → Using database integrations
 Phase 2: Container orchestration (60 mins) → Docker management  
 Phase 3: CI/CD pipeline (90 mins) → GitHub automation
 Phase 4: Monitoring deployment (60 mins) → System monitoring
@@ -257,14 +265,13 @@ Phase 5: Security hardening (45 mins) → Security audit tools
 🌐 Multi-OS Compatibility Orchestration
 
 🔍 ENVIRONMENT ANALYSIS:
-- Primary OS: Windows 11 (detected)
+- Primary OS: [Detected automatically]
 - Target compatibility: Windows + Linux
 - Team requirements: Collaborative development
 - Resource optimization: Containerized approach
 
 🛠️ UNIFIED STRATEGY:
 ✅ Docker-based development environment
-✅ WSL2 integration for Windows
 ✅ Cross-platform file operations with security
 ✅ Shared database cluster setup
 ✅ Team synchronization protocols
@@ -358,9 +365,9 @@ marathon analytics --forecast --completion-estimate
 └─ Risk Level: LOW (all systems optimal)
 
 ⚡ MCP Performance:
-├─ acura-server: 94% efficiency ⭐
-├─ github: 88% efficiency ⭐
-├─ desktop-commander: 91% efficiency ⭐
+├─ server-tools: 94% efficiency ⭐
+├─ github-integration: 88% efficiency ⭐
+├─ desktop-controller: 91% efficiency ⭐
 └─ Overall coordination: 92% efficiency
 
 🔧 Resource Utilization:
@@ -417,7 +424,7 @@ interface ContextManager {
 [COMPRESSED_STATE_DATA]
 Progress: Infrastructure Phase 2 complete
 Next: Monitoring stack deployment
-MCPs: acura-server✓ github✓ desktop-commander✓ filesystem✓"
+MCPs: server-tools✓ github✓ desktop-controller✓ filesystem✓"
 
 ✅ Transfer verification code: MRT-7K9X-2025
 ```
@@ -449,7 +456,7 @@ What would you like to accomplish?
 🎯 Project detected: API deployment
 📊 Complexity: Medium
 ⏱️ Estimated time: 2-3 hours
-🔧 Recommended MCPs: acura-server, github, monitoring
+🔧 Recommended MCPs: server-management, github, monitoring
 
 Proceed with automated planning? [Y/n]
 ```
@@ -459,7 +466,7 @@ Proceed with automated planning? [Y/n]
 +++ Deploy API --env=prod --monitoring --ci-cd
 
 🏃‍♂️ Executing: Production API deployment
-📊 MCPs: acura-server, github, desktop-commander
+📊 MCPs: server-management, github, desktop-controller
 ⚡ Starting parallel execution...
 ```
 
@@ -492,16 +499,10 @@ Create `~/.marathon-mcp/config.json`:
     }
   },
   "integrations": {
-    "filesystem_enhanced": true,
-    "desktop_commander_enhanced": true,
-    "server_management": true,
-    "real_time_monitoring": true
-  },
-  "analytics": {
-    "performance_tracking": true,
-    "usage_analytics": true,
-    "optimization_suggestions": true,
-    "predictive_analysis": true
+    "auto_discovery": true,
+    "optimization_enabled": true,
+    "real_time_monitoring": true,
+    "cross_platform_support": true
   },
   "user_experience": {
     "mode": "adaptive",
@@ -525,7 +526,7 @@ Create `~/.marathon-mcp/config.json`:
 # 2. Watch the magic happen
 🏃‍♂️ MARATHON ACTIVATED
 📊 Analyzing project requirements...
-🔧 Selected MCPs: acura-server, desktop-commander, filesystem
+🔧 Selected MCPs: server-management, desktop-tools, filesystem
 ⚡ Creating monitoring dashboard...
 
 # 3. Real-time progress
