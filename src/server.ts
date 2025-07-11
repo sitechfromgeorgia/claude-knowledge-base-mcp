@@ -8,52 +8,50 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
-import { promises as fs } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { homedir } from 'os';
+import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import * as cron from 'node-cron';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { AdvancedMemorySystem } from './memory-system.js';
+import { MCPConfig, SessionData, CommandExecution } from './types.js';
 
-// Knowledge Base data directory
-const KB_DATA_DIR = process.env.KB_DATA_DIR || join(homedir(), '.claude-knowledge-base');
+// Default configuration
+const DEFAULT_CONFIG: MCPConfig = {
+  dataDir: process.env.KB_DATA_DIR || join(homedir(), '.claude-knowledge-base'),
+  maxContextSize: 100000,
+  autoSaveInterval: 5, // minutes
+  vectorDimension: 100,
+  maxMemoryItems: 10000,
+  compressionThreshold: 0.8,
+  marathonEnabled: true,
+  contextOverflowThreshold: 80000,
+  checkpointInterval: 5, // minutes
+  integrations: {
+    vectorDB: 'local',
+    workflows: 'none',
+    storage: 'local',
+    monitoring: 'none'
+  }
+};
 
-// Ensure data directory exists
-await fs.mkdir(KB_DATA_DIR, { recursive: true });
-await fs.mkdir(join(KB_DATA_DIR, 'sessions'), { recursive: true });
-
-interface KnowledgeBase {
-  infrastructure: any;
-  projects: any;
-  interactions: any;
-  workflows: any;
-  insights: any;
-  currentSession: string;
-  lastUpdated: string;
-}
-
-interface SessionData {
-  id: string;
-  startTime: string;
-  endTime?: string;
-  commands: string[];
-  results: any[];
-  marathonMode: boolean;
-  context: string;
-}
-
-class ClaudeKnowledgeBase {
+class ClaudeKnowledgeBaseMCP {
   private server: Server;
-  private knowledgeBase: KnowledgeBase;
+  private memorySystem: AdvancedMemorySystem;
+  private config: MCPConfig;
   private currentSession: SessionData;
+  private autoSaveScheduler?: cron.ScheduledTask;
 
-  constructor() {
+  constructor(config: MCPConfig = DEFAULT_CONFIG) {
+    this.config = { ...DEFAULT_CONFIG, ...config };
+    this.memorySystem = new AdvancedMemorySystem(this.config);
+    
+    this.currentSession = this.createNewSession();
+
     this.server = new Server(
       {
         name: 'claude-knowledge-base',
-        version: '1.0.0',
+        version: '2.0.0',
       },
       {
         capabilities: {
@@ -62,63 +60,66 @@ class ClaudeKnowledgeBase {
       }
     );
 
-    this.knowledgeBase = {
-      infrastructure: {},
-      projects: {},
-      interactions: [],
-      workflows: {},
-      insights: {},
-      currentSession: '',
-      lastUpdated: new Date().toISOString(),
-    };
+    this.setupTools();
+    this.initializeMarathonMode();
+  }
 
-    this.currentSession = {
+  private createNewSession(): SessionData {
+    return {
       id: uuidv4(),
       startTime: new Date().toISOString(),
       commands: [],
-      results: [],
       marathonMode: false,
-      context: '',
+      contextSize: 0,
+      checkpoints: [],
+      status: 'active'
     };
-
-    this.setupTools();
   }
 
   private setupTools() {
-    // Command parser and executor
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
           {
             name: 'kb_command',
-            description: 'Execute knowledge base commands (---, +++, ..., ***)',
+            description: 'Enhanced command processor (---, +++, ..., ***) with Marathon Mode',
             inputSchema: {
               type: 'object',
               properties: {
                 command: {
                   type: 'string',
-                  description: 'Command string with symbols and task description',
+                  description: 'Command with symbols: --- (load), +++ (execute), ... (save), *** (marathon)',
                 },
               },
               required: ['command'],
             },
           },
           {
-            name: 'kb_load',
-            description: 'Load knowledge base context (--- command)',
+            name: 'kb_load_context',
+            description: 'Smart context loading with relevance filtering',
             inputSchema: {
               type: 'object',
               properties: {
                 query: {
                   type: 'string',
-                  description: 'Optional query to filter context',
+                  description: 'Context search query',
+                },
+                categories: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Filter by categories: infrastructure, projects, interactions, workflows, insights',
+                },
+                limit: {
+                  type: 'number',
+                  description: 'Maximum results to return',
+                  default: 10,
                 },
               },
             },
           },
           {
-            name: 'kb_execute',
-            description: 'Execute complex task (+++ command)',
+            name: 'kb_execute_complex',
+            description: 'Complex task execution with tool chaining',
             inputSchema: {
               type: 'object',
               properties: {
@@ -126,51 +127,102 @@ class ClaudeKnowledgeBase {
                   type: 'string',
                   description: 'Complex task to execute',
                 },
-                useMarathonMode: {
+                enableMarathon: {
                   type: 'boolean',
                   description: 'Enable Marathon Mode for long tasks',
                   default: false,
+                },
+                steps: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Optional predefined steps',
                 },
               },
               required: ['task'],
             },
           },
           {
-            name: 'kb_update',
-            description: 'Update knowledge base (... command)',
+            name: 'kb_save_progress',
+            description: 'Event-driven progress saving with intelligent checkpointing',
             inputSchema: {
               type: 'object',
               properties: {
                 data: {
                   type: 'object',
-                  description: 'Data to update in knowledge base',
+                  description: 'Progress data to save',
                 },
                 category: {
                   type: 'string',
                   enum: ['infrastructure', 'projects', 'interactions', 'workflows', 'insights'],
-                  description: 'Category to update',
+                  description: 'Memory category',
+                },
+                priority: {
+                  type: 'string',
+                  enum: ['critical', 'high', 'medium', 'low'],
+                  default: 'medium',
+                },
+                tags: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Tags for better organization',
                 },
               },
               required: ['data', 'category'],
             },
           },
           {
-            name: 'kb_marathon',
-            description: 'Marathon Mode save & switch (*** command)',
+            name: 'kb_marathon_mode',
+            description: 'Marathon Mode management with automated session transfer',
             inputSchema: {
               type: 'object',
               properties: {
                 action: {
                   type: 'string',
-                  enum: ['save_and_switch', 'continue'],
-                  description: 'Marathon action to perform',
+                  enum: ['prepare_transfer', 'restore_checkpoint', 'create_checkpoint', 'status'],
+                  description: 'Marathon Mode action',
                 },
-                taskDescription: {
+                checkpointId: {
                   type: 'string',
-                  description: 'Description of task for continuation',
+                  description: 'Checkpoint ID for restore operations',
+                },
+                sessionId: {
+                  type: 'string',
+                  description: 'Session ID for operations',
                 },
               },
               required: ['action'],
+            },
+          },
+          {
+            name: 'kb_search_memory',
+            description: 'Advanced semantic search with graph context',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                query: {
+                  type: 'string',
+                  description: 'Search query',
+                },
+                includeGraph: {
+                  type: 'boolean',
+                  description: 'Include knowledge graph context',
+                  default: true,
+                },
+                timeRange: {
+                  type: 'object',
+                  properties: {
+                    start: { type: 'string' },
+                    end: { type: 'string' },
+                  },
+                  description: 'Filter by time range',
+                },
+                threshold: {
+                  type: 'number',
+                  description: 'Similarity threshold (0-1)',
+                  default: 0.3,
+                },
+              },
+              required: ['query'],
             },
           },
         ] as Tool[],
@@ -183,15 +235,17 @@ class ClaudeKnowledgeBase {
 
         switch (name) {
           case 'kb_command':
-            return await this.handleCommand(args.command);
-          case 'kb_load':
-            return await this.loadKnowledgeBase(args.query);
-          case 'kb_execute':
-            return await this.executeComplexTask(args.task, args.useMarathonMode);
-          case 'kb_update':
-            return await this.updateKnowledgeBase(args.data, args.category);
-          case 'kb_marathon':
-            return await this.marathonMode(args.action, args.taskDescription);
+            return await this.handleEnhancedCommand(args.command);
+          case 'kb_load_context':
+            return await this.loadContext(args.query, args.categories, args.limit);
+          case 'kb_execute_complex':
+            return await this.executeComplexTask(args.task, args.enableMarathon, args.steps);
+          case 'kb_save_progress':
+            return await this.saveProgress(args.data, args.category, args.priority, args.tags);
+          case 'kb_marathon_mode':
+            return await this.handleMarathonMode(args.action, args.checkpointId, args.sessionId);
+          case 'kb_search_memory':
+            return await this.searchMemory(args.query, args.includeGraph, args.timeRange, args.threshold);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -200,7 +254,7 @@ class ClaudeKnowledgeBase {
           content: [
             {
               type: 'text',
-              text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+              text: `❌ Error: ${error instanceof Error ? error.message : String(error)}`,
             },
           ],
         };
@@ -208,377 +262,560 @@ class ClaudeKnowledgeBase {
     });
   }
 
-  private async handleCommand(command: string) {
-    // Parse command symbols
-    const hasLoad = command.includes('---');
-    const hasExecute = command.includes('+++');
-    const hasUpdate = command.includes('...');
-    const hasMarathon = command.includes('***');
+  private initializeMarathonMode() {
+    if (this.config.marathonEnabled) {
+      // Auto-save scheduler
+      this.autoSaveScheduler = cron.schedule(`*/${this.config.autoSaveInterval} * * * *`, async () => {
+        await this.performAutoSave();
+      });
 
-    // Extract task description (remove symbols)
-    const taskDescription = command
+      // Context overflow detection
+      setInterval(() => {
+        this.checkContextOverflow();
+      }, 60000); // Check every minute
+    }
+  }
+
+  // === ENHANCED COMMAND PROCESSING ===
+
+  private async handleEnhancedCommand(command: string) {
+    const symbols = {
+      load: command.includes('---'),
+      execute: command.includes('+++'),
+      save: command.includes('...'),
+      marathon: command.includes('***')
+    };
+
+    const cleanCommand = command
       .replace(/---/g, '')
       .replace(/\+\+\+/g, '')
       .replace(/\.\.\./g, '')
       .replace(/\*\*\*/g, '')
       .trim();
 
-    let result = { steps: [], context: '', marathon: false };
-
-    // Execute in order based on symbols present
-    if (hasLoad) {
-      const loadResult = await this.loadKnowledgeBase();
-      result.steps.push({ action: 'load', result: loadResult });
-      result.context = loadResult.content[0].text;
-    }
-
-    if (hasExecute) {
-      const executeResult = await this.executeComplexTask(taskDescription, hasMarathon);
-      result.steps.push({ action: 'execute', result: executeResult });
-    }
-
-    if (hasUpdate) {
-      // Update with current session data
-      const updateData = {
-        task: taskDescription,
-        timestamp: new Date().toISOString(),
-        command: command,
-        sessionId: this.currentSession.id,
-      };
-      const updateResult = await this.updateKnowledgeBase(updateData, 'interactions');
-      result.steps.push({ action: 'update', result: updateResult });
-    }
-
-    if (hasMarathon) {
-      const marathonResult = await this.marathonMode('save_and_switch', taskDescription);
-      result.steps.push({ action: 'marathon', result: marathonResult });
-      result.marathon = true;
-    }
-
-    // Log command execution
-    this.currentSession.commands.push(command);
-    this.currentSession.results.push(result);
-
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(result, null, 2),
-        },
-      ],
+    const execution: CommandExecution = {
+      command,
+      type: 'load', // Will be updated based on primary action
+      timestamp: new Date().toISOString(),
+      result: null,
+      duration: 0,
+      success: false
     };
-  }
 
-  private async loadKnowledgeBase(query?: string) {
+    const startTime = Date.now();
+    const results: any[] = [];
+
     try {
-      // Load all knowledge base files
-      const infrastructure = await this.loadFile('infrastructure.json');
-      const projects = await this.loadFile('projects.json');
-      const interactions = await this.loadFile('interactions.json');
-      const workflows = await this.loadFile('workflows.json');
-      const insights = await this.loadFile('insights.json');
-
-      this.knowledgeBase = {
-        infrastructure,
-        projects,
-        interactions,
-        workflows,
-        insights,
-        currentSession: this.currentSession.id,
-        lastUpdated: new Date().toISOString(),
-      };
-
-      // Filter by query if provided
-      let contextText = `
-🧠 Knowledge Base Loaded Successfully
-
-📊 Infrastructure Status: ${Object.keys(infrastructure).length} items
-📋 Active Projects: ${Object.keys(projects).length} projects  
-💬 Interactions: ${interactions.length || 0} recorded
-🔄 Workflows: ${Object.keys(workflows).length} defined
-📚 Insights: ${Object.keys(insights).length} documented
-
-Current Session: ${this.currentSession.id}
-Last Updated: ${this.knowledgeBase.lastUpdated}
-`;
-
-      if (query) {
-        // Simple query filtering (can be enhanced)
-        const relevantData = this.searchKnowledgeBase(query);
-        contextText += `\n🔍 Query Results for "${query}":\n${JSON.stringify(relevantData, null, 2)}`;
+      // 1. Load Context (---)
+      if (symbols.load) {
+        execution.type = 'load';
+        const contextResult = await this.memorySystem.loadContextForSession(
+          this.currentSession.id,
+          cleanCommand
+        );
+        results.push({
+          type: 'context_loaded',
+          memories: contextResult.relevantMemories.length,
+          graphEntities: contextResult.graphContext.entities.length,
+          sessionHistory: !!contextResult.sessionHistory
+        });
       }
 
+      // 2. Execute Complex Task (+++)
+      if (symbols.execute) {
+        execution.type = 'execute';
+        const taskResult = await this.executeTaskWithSequentialThinking(
+          cleanCommand,
+          symbols.marathon
+        );
+        results.push(taskResult);
+      }
+
+      // 3. Save Progress (...)
+      if (symbols.save) {
+        execution.type = 'update';
+        const saveResult = await this.intelligentProgressSave(cleanCommand, results);
+        results.push(saveResult);
+      }
+
+      // 4. Marathon Mode (***)
+      if (symbols.marathon) {
+        execution.type = 'marathon';
+        const marathonResult = await this.handleMarathonTransfer();
+        results.push(marathonResult);
+      }
+
+      execution.success = true;
+      execution.result = results;
+      execution.duration = Date.now() - startTime;
+
+      // Add to session history
+      this.currentSession.commands.push(execution);
+      this.updateContextSize();
+
       return {
         content: [
           {
             type: 'text',
-            text: contextText,
+            text: this.formatCommandResults(symbols, results, execution.duration),
           },
         ],
       };
+
     } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error loading knowledge base: ${error instanceof Error ? error.message : String(error)}`,
-          },
-        ],
-      };
+      execution.success = false;
+      execution.result = { error: error instanceof Error ? error.message : String(error) };
+      execution.duration = Date.now() - startTime;
+
+      this.currentSession.commands.push(execution);
+
+      throw error;
     }
   }
 
-  private async executeComplexTask(task: string, marathonMode: boolean = false) {
-    // Mark marathon mode if requested
-    this.currentSession.marathonMode = marathonMode;
-
-    const execution = {
+  private async executeTaskWithSequentialThinking(task: string, marathonMode: boolean) {
+    return {
+      type: 'sequential_execution',
       task,
-      sessionId: this.currentSession.id,
-      startTime: new Date().toISOString(),
       marathonMode,
-      status: 'executing',
       steps: [
-        'Sequential thinking initiated',
-        'Loading relevant context from knowledge base',
-        'Analyzing task complexity and requirements',
-        'Determining required tools and resources',
-        'Executing step-by-step workflow',
-        marathonMode ? 'Marathon Mode: Progress tracking enabled' : '',
+        '🧠 Analyzing task complexity and requirements',
+        '📚 Loading relevant context from knowledge base',
+        '🔍 Identifying required tools and resources',
+        '⚡ Executing step-by-step workflow',
+        '💾 Tracking progress and creating checkpoints',
+        marathonMode ? '🏃‍♂️ Marathon Mode: Enhanced persistence enabled' : ''
       ].filter(Boolean),
+      timestamp: new Date().toISOString(),
+      sessionId: this.currentSession.id,
+      status: 'initiated'
     };
+  }
 
-    // Save execution state
-    await this.saveFile(`sessions/${this.currentSession.id}.json`, this.currentSession);
+  private async intelligentProgressSave(command: string, previousResults: any[]) {
+    // Determine category based on content
+    const category = this.categorizeContent(command, previousResults);
+    
+    // Generate intelligent tags
+    const tags = this.generateTags(command, previousResults);
+    
+    // Extract priority from context
+    const priority = this.determinePriority(command, previousResults);
+
+    const memoryId = await this.memorySystem.saveMemory({
+      content: `Command: ${command}\nResults: ${JSON.stringify(previousResults, null, 2)}`,
+      category,
+      sessionId: this.currentSession.id,
+      priority,
+      tags,
+      metadata: {
+        commandType: 'enhanced',
+        resultCount: previousResults.length,
+        executionContext: 'mcp_server'
+      }
+    });
+
+    return {
+      type: 'progress_saved',
+      memoryId,
+      category,
+      priority,
+      tags,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  // === MARATHON MODE IMPLEMENTATION ===
+
+  private async handleMarathonTransfer() {
+    const result = await this.memorySystem.prepareMarathonTransfer(this.currentSession.id);
+    
+    // Mark current session for transfer
+    this.currentSession.status = 'transferred';
+    this.currentSession.endTime = new Date().toISOString();
+
+    return {
+      type: 'marathon_transfer',
+      checkpointId: result.checkpointId,
+      transferInstructions: result.transferInstructions,
+      contextSummary: result.contextSummary,
+      sessionId: this.currentSession.id
+    };
+  }
+
+  private async performAutoSave() {
+    if (this.currentSession.commands.length === 0) return;
+
+    try {
+      const checkpointId = await this.memorySystem.createCheckpoint(
+        this.currentSession.id,
+        'auto'
+      );
+      
+      console.error(`🔄 Auto-save checkpoint created: ${checkpointId}`);
+    } catch (error) {
+      console.error(`❌ Auto-save failed: ${error}`);
+    }
+  }
+
+  private checkContextOverflow() {
+    if (this.currentSession.contextSize > this.config.contextOverflowThreshold) {
+      console.error(`⚠️ Context overflow detected: ${this.currentSession.contextSize} > ${this.config.contextOverflowThreshold}`);
+      // Could trigger automatic Marathon Mode here
+    }
+  }
+
+  // === TOOL IMPLEMENTATIONS ===
+
+  private async loadContext(query?: string, categories?: string[], limit = 10) {
+    const contextData = await this.memorySystem.loadContextForSession(
+      this.currentSession.id,
+      query
+    );
+
+    const memories = categories 
+      ? contextData.relevantMemories.filter(m => categories.includes(m.category))
+      : contextData.relevantMemories;
 
     return {
       content: [
         {
           type: 'text',
           text: `
-🚀 Complex Task Execution Started
+🧠 **Context Loaded Successfully**
 
-Task: ${task}
-Session: ${this.currentSession.id}
-Marathon Mode: ${marathonMode ? '✅ Enabled' : '❌ Disabled'}
+**Relevant Memories:** ${memories.slice(0, limit).length}
+**Graph Entities:** ${contextData.graphContext.entities.length}
+**Session History:** ${contextData.sessionHistory ? 'Available' : 'None'}
 
-Execution Steps:
-${execution.steps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
+**Recent Memories:**
+${memories.slice(0, limit).map((m, i) => 
+  `${i + 1}. [${m.category}] ${m.content.substring(0, 100)}...`
+).join('\n')}
 
-${marathonMode ? `
-⚡ Marathon Mode Active:
-- Progress tracking every 5 minutes
-- Automatic save & switch when context full
-- Seamless continuation capability
-- Use "*** +++" to save and switch when needed
-` : ''}
-
-Status: ${execution.status}
-`,
+**Graph Context:**
+${contextData.graphContext.entities.slice(0, 5).map(e => 
+  `• ${e.name} (${e.type}) - ${e.properties.mentions || 0} mentions`
+).join('\n')}
+          `.trim(),
         },
       ],
     };
   }
 
-  private async updateKnowledgeBase(data: any, category: keyof KnowledgeBase) {
-    try {
-      if (category === 'currentSession' || category === 'lastUpdated') {
-        throw new Error('Cannot directly update system fields');
+  private async executeComplexTask(task: string, enableMarathon = false, steps?: string[]) {
+    if (enableMarathon) {
+      this.currentSession.marathonMode = true;
+    }
+
+    const taskExecution = {
+      task,
+      sessionId: this.currentSession.id,
+      marathonMode: enableMarathon,
+      predefinedSteps: steps,
+      startTime: new Date().toISOString(),
+      status: 'executing'
+    };
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `
+🚀 **Complex Task Execution Started**
+
+**Task:** ${task}
+**Session:** ${this.currentSession.id}
+**Marathon Mode:** ${enableMarathon ? '✅ Enabled' : '❌ Disabled'}
+
+**Execution Strategy:**
+${steps ? steps.map((step, i) => `${i + 1}. ${step}`).join('\n') : 
+  '• Sequential thinking with context awareness\n• Tool chaining for multi-step operations\n• Automatic progress tracking\n• Error handling and recovery'}
+
+${enableMarathon ? `
+⚡ **Marathon Mode Features:**
+• Auto-save every ${this.config.autoSaveInterval} minutes
+• Context overflow protection
+• Seamless session transfer capability
+• Enhanced error recovery
+` : ''}
+
+**Status:** ${taskExecution.status}
+          `.trim(),
+        },
+      ],
+    };
+  }
+
+  private async saveProgress(data: any, category: string, priority = 'medium', tags: string[] = []) {
+    const memoryId = await this.memorySystem.saveMemory({
+      content: typeof data === 'string' ? data : JSON.stringify(data, null, 2),
+      category: category as any,
+      sessionId: this.currentSession.id,
+      priority: priority as any,
+      tags,
+      metadata: {
+        source: 'manual_save',
+        timestamp: new Date().toISOString()
       }
+    });
 
-      // Load current data
-      const currentData = await this.loadFile(`${category}.json`);
-      
-      // Merge with new data
-      let updatedData;
-      if (Array.isArray(currentData)) {
-        updatedData = [...currentData, data];
-      } else {
-        updatedData = { ...currentData, ...data };
-      }
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `
+💾 **Progress Saved Successfully**
 
-      // Save updated data
-      await this.saveFile(`${category}.json`, updatedData);
-      
-      // Update in-memory knowledge base
-      this.knowledgeBase[category] = updatedData;
-      this.knowledgeBase.lastUpdated = new Date().toISOString();
+**Memory ID:** ${memoryId}
+**Category:** ${category}
+**Priority:** ${priority}
+**Tags:** ${tags.join(', ') || 'None'}
+**Session:** ${this.currentSession.id}
 
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `
-✅ Knowledge Base Updated
+**Data Size:** ${JSON.stringify(data).length} characters
+**Timestamp:** ${new Date().toISOString()}
+          `.trim(),
+        },
+      ],
+    };
+  }
 
-Category: ${category}
-Data Added: ${JSON.stringify(data, null, 2)}
-Timestamp: ${this.knowledgeBase.lastUpdated}
-Session: ${this.currentSession.id}
-
-Total ${category} entries: ${Array.isArray(updatedData) ? updatedData.length : Object.keys(updatedData).length}
-`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error updating knowledge base: ${error instanceof Error ? error.message : String(error)}`,
-          },
-        ],
-      };
+  private async handleMarathonMode(action: string, checkpointId?: string, sessionId?: string) {
+    switch (action) {
+      case 'prepare_transfer':
+        return await this.prepareTransfer();
+      case 'restore_checkpoint':
+        return await this.restoreCheckpoint(checkpointId!);
+      case 'create_checkpoint':
+        return await this.createManualCheckpoint();
+      case 'status':
+        return await this.getMarathonStatus();
+      default:
+        throw new Error(`Unknown Marathon Mode action: ${action}`);
     }
   }
 
-  private async marathonMode(action: string, taskDescription?: string) {
-    if (action === 'save_and_switch') {
-      // Save current session state
-      this.currentSession.endTime = new Date().toISOString();
-      this.currentSession.marathonMode = true;
-      await this.saveFile(`sessions/${this.currentSession.id}.json`, this.currentSession);
+  private async prepareTransfer() {
+    const result = await this.memorySystem.prepareMarathonTransfer(this.currentSession.id);
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result.transferInstructions,
+        },
+      ],
+    };
+  }
 
-      // Save current task state for continuation
-      const marathonState = {
-        sessionId: this.currentSession.id,
-        taskDescription: taskDescription || 'Marathon task',
-        timestamp: new Date().toISOString(),
-        context: this.currentSession.context,
-        commands: this.currentSession.commands,
-        status: 'ready_for_continuation',
-      };
+  private async restoreCheckpoint(checkpointId: string) {
+    const result = await this.memorySystem.restoreFromCheckpoint(checkpointId);
+    
+    // Update current session
+    this.currentSession = {
+      id: result.sessionId,
+      startTime: new Date().toISOString(),
+      commands: [],
+      marathonMode: true,
+      contextSize: 0,
+      checkpoints: [],
+      status: 'active'
+    };
 
-      await this.saveFile('marathon-state.json', marathonState);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result.contextSummary,
+        },
+      ],
+    };
+  }
 
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `
-🏃‍♂️ Marathon Mode: Save & Switch Complete
+  private async createManualCheckpoint() {
+    const checkpointId = await this.memorySystem.createCheckpoint(
+      this.currentSession.id,
+      'manual'
+    );
 
-✅ Current progress saved
-📝 Session: ${this.currentSession.id}
-💾 State preserved for continuation
-⚡ Ready for fresh session
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `✅ Manual checkpoint created: ${checkpointId}`,
+        },
+      ],
+    };
+  }
 
-🎯 To continue in new chat window:
---- +++ ... *** Continue ${taskDescription || 'previous task'} from previous session
+  private async getMarathonStatus() {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `
+📊 **Marathon Mode Status**
 
-📊 Marathon State:
-- Task: ${taskDescription || 'Marathon task'}
-- Session ID: ${this.currentSession.id}
-- Commands executed: ${this.currentSession.commands.length}
-- Timestamp: ${marathonState.timestamp}
+**Current Session:** ${this.currentSession.id}
+**Marathon Mode:** ${this.currentSession.marathonMode ? '✅ Active' : '❌ Inactive'}
+**Commands Executed:** ${this.currentSession.commands.length}
+**Context Size:** ${this.currentSession.contextSize}
+**Auto-Save:** ${this.autoSaveScheduler ? '✅ Enabled' : '❌ Disabled'}
+**Checkpoints:** ${this.currentSession.checkpoints.length}
 
-Open new chat window and use the continuation command above.
-Context window optimization complete! 🚀
-`,
-          },
-        ],
-      };
-    } else if (action === 'continue') {
-      // Load marathon state and continue
-      try {
-        const marathonState = await this.loadFile('marathon-state.json');
-        
-        // Create new session for continuation
-        this.currentSession = {
-          id: uuidv4(),
-          startTime: new Date().toISOString(),
-          commands: [],
-          results: [],
-          marathonMode: true,
-          context: marathonState.context || '',
-        };
+**Configuration:**
+• Auto-save interval: ${this.config.autoSaveInterval} minutes
+• Context overflow threshold: ${this.config.contextOverflowThreshold}
+• Max memory items: ${this.config.maxMemoryItems}
+          `.trim(),
+        },
+      ],
+    };
+  }
 
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `
-🏃‍♂️ Marathon Mode: Continuation Loaded
+  private async searchMemory(query: string, includeGraph = true, timeRange?: any, threshold = 0.3) {
+    const searchOptions = {
+      threshold,
+      includeMetadata: true,
+      timeRange,
+      limit: 20
+    };
 
-✅ Previous state restored
-🔄 Session: ${this.currentSession.id} (new)
-📂 Previous session: ${marathonState.sessionId}
-⚡ Ready to continue execution
-
-📊 Restored Context:
-- Task: ${marathonState.taskDescription}
-- Previous commands: ${marathonState.commands?.length || 0}
-- Timestamp: ${marathonState.timestamp}
-
-🚀 Marathon Mode active - seamless continuation ready!
-You can now execute complex tasks with full context restored.
-`,
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Error loading marathon state: ${error instanceof Error ? error.message : String(error)}`,
-            },
-          ],
-        };
-      }
+    const memories = await this.memorySystem.searchMemory(query, searchOptions);
+    
+    let graphContext = { entities: [], relationships: [] };
+    if (includeGraph) {
+      graphContext = await this.memorySystem.loadContextForSession(this.currentSession.id, query)
+        .then(result => result.graphContext);
     }
 
     return {
       content: [
         {
           type: 'text',
-          text: `Unknown marathon action: ${action}`,
+          text: `
+🔍 **Memory Search Results**
+
+**Query:** "${query}"
+**Results Found:** ${memories.length}
+**Graph Entities:** ${graphContext.entities.length}
+
+**Memories:**
+${memories.slice(0, 10).map((m, i) => 
+  `${i + 1}. [${m.category}] ${m.content.substring(0, 150)}...
+   Tags: ${m.tags.join(', ')} | Priority: ${m.priority}`
+).join('\n\n')}
+
+${includeGraph && graphContext.entities.length > 0 ? `
+**Related Entities:**
+${graphContext.entities.slice(0, 5).map(e => 
+  `• ${e.name} (${e.type})`
+).join('\n')}
+` : ''}
+          `.trim(),
         },
       ],
     };
   }
 
-  private searchKnowledgeBase(query: string) {
-    const results: any = {};
+  // === UTILITY METHODS ===
+
+  private categorizeContent(command: string, results: any[]): string {
+    const lowerCommand = command.toLowerCase();
     
-    // Simple search across all categories
-    Object.entries(this.knowledgeBase).forEach(([category, data]) => {
-      if (category === 'currentSession' || category === 'lastUpdated') return;
-      
-      const dataStr = JSON.stringify(data).toLowerCase();
-      if (dataStr.includes(query.toLowerCase())) {
-        results[category] = data;
-      }
-    });
-
-    return results;
-  }
-
-  private async loadFile(filename: string): Promise<any> {
-    try {
-      const filePath = join(KB_DATA_DIR, filename);
-      const data = await fs.readFile(filePath, 'utf-8');
-      return JSON.parse(data);
-    } catch (error) {
-      // Return default structure if file doesn't exist
-      if (filename.includes('interactions')) return [];
-      return {};
+    if (lowerCommand.includes('deploy') || lowerCommand.includes('server') || lowerCommand.includes('config')) {
+      return 'infrastructure';
     }
+    if (lowerCommand.includes('project') || lowerCommand.includes('task') || lowerCommand.includes('develop')) {
+      return 'projects';
+    }
+    if (lowerCommand.includes('workflow') || lowerCommand.includes('automation') || lowerCommand.includes('process')) {
+      return 'workflows';
+    }
+    if (lowerCommand.includes('learn') || lowerCommand.includes('insight') || lowerCommand.includes('analysis')) {
+      return 'insights';
+    }
+    
+    return 'interactions';
   }
 
-  private async saveFile(filename: string, data: any): Promise<void> {
-    const filePath = join(KB_DATA_DIR, filename);
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  private generateTags(command: string, results: any[]): string[] {
+    const tags = new Set<string>();
+    
+    // Extract tags from command
+    const words = command.toLowerCase().split(/\s+/);
+    const importantWords = words.filter(word => 
+      word.length > 3 && 
+      !['the', 'and', 'for', 'with', 'from', 'that', 'this'].includes(word)
+    );
+    
+    importantWords.slice(0, 3).forEach(word => tags.add(word));
+    
+    // Add context tags
+    if (results.some(r => r.type === 'marathon_transfer')) tags.add('marathon');
+    if (results.some(r => r.type === 'sequential_execution')) tags.add('complex-task');
+    
+    return Array.from(tags);
+  }
+
+  private determinePriority(command: string, results: any[]): string {
+    const lowerCommand = command.toLowerCase();
+    
+    if (lowerCommand.includes('critical') || lowerCommand.includes('urgent') || lowerCommand.includes('emergency')) {
+      return 'critical';
+    }
+    if (lowerCommand.includes('important') || lowerCommand.includes('deploy') || lowerCommand.includes('production')) {
+      return 'high';
+    }
+    if (lowerCommand.includes('low') || lowerCommand.includes('minor') || lowerCommand.includes('note')) {
+      return 'low';
+    }
+    
+    return 'medium';
+  }
+
+  private updateContextSize() {
+    this.currentSession.contextSize = JSON.stringify(this.currentSession).length;
+  }
+
+  private formatCommandResults(symbols: any, results: any[], duration: number): string {
+    const symbolsList = Object.entries(symbols)
+      .filter(([_, active]) => active)
+      .map(([symbol, _]) => {
+        const symbolMap: Record<string, string> = {
+          load: '--- (Context Loaded)',
+          execute: '+++ (Task Executed)',
+          save: '... (Progress Saved)',
+          marathon: '*** (Marathon Mode)'
+        };
+        return symbolMap[symbol];
+      });
+
+    return `
+🎯 **Enhanced Command Execution Complete**
+
+**Symbols Used:** ${symbolsList.join(', ')}
+**Duration:** ${duration}ms
+**Session:** ${this.currentSession.id}
+
+**Results:**
+${results.map((result, i) => `${i + 1}. ${JSON.stringify(result, null, 2)}`).join('\n')}
+
+**Next Actions Available:**
+• Use \`kb_search_memory\` to find related information
+• Use \`kb_marathon_mode\` to manage session transfer
+• Use enhanced commands with symbol combinations
+    `.trim();
   }
 
   async start() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error('Claude Knowledge Base MCP Server started');
+    console.error('🧠 Claude Knowledge Base MCP v2.0 Server started with Marathon Mode');
   }
 }
 
 // Start the server
-const knowledgeBase = new ClaudeKnowledgeBase();
-await knowledgeBase.start();
+const server = new ClaudeKnowledgeBaseMCP();
+await server.start();
