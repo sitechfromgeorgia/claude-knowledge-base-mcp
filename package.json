@@ -1,7 +1,7 @@
 {
   "name": "claude-knowledge-base-mcp",
   "version": "3.0.0",
-  "description": "Advanced Local Knowledge Management System for Claude Desktop with SQLite, local NLP, Marathon Mode, and seamless tool integration",
+  "description": "🇬🇪 Advanced Local Knowledge Management System for Claude Desktop - Built with Love from Georgia, Batumi ❤️ | SQLite, local NLP, Marathon Mode, and seamless tool integration",
   "main": "dist/server-v3.js",
   "type": "module",
   "scripts": {
@@ -38,9 +38,18 @@
     "automation",
     "offline",
     "tool-integration",
-    "dual-syntax"
+    "dual-syntax",
+    "georgia",
+    "batumi",
+    "georgian-tech",
+    "black-sea-innovation"
   ],
-  "author": "Acura Group",
+  "author": {
+    "name": "Acura Group",
+    "email": "info@acura.ge",
+    "url": "https://acura.ge",
+    "location": "Batumi, Georgia 🇬🇪"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -98,5 +107,24 @@
   "optionalDependencies": {
     "inquirer": "^9.2.12",
     "fuse.js": "^7.0.0"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/sitechfromgeorgia"
+  },
+  "contributors": [
+    {
+      "name": "Georgian Tech Community",
+      "url": "https://github.com/sitechfromgeorgia",
+      "location": "Batumi, Georgia 🇬🇪"
+    }
+  ],
+  "config": {
+    "origin": {
+      "country": "Georgia 🇬🇪",
+      "city": "Batumi 🌊",
+      "inspiration": "Black Sea coastal innovation",
+      "built_with": "Georgian hospitality and technical excellence"
+    }
   }
 }
