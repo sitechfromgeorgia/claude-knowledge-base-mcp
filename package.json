@@ -1,6 +1,6 @@
 {
   "name": "claude-knowledge-base-mcp",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "🇬🇪 Advanced Local Knowledge Management System for Claude Desktop - Built with Love from Georgia, Batumi ❤️ | SQLite, local NLP, Marathon Mode, and seamless tool integration",
   "main": "dist/server-v3.js",
   "type": "module",
@@ -17,10 +17,13 @@
     "clean": "rm -rf dist",
     "prepare": "npm run build",
     "setup": "node scripts/setup.js",
+    "setup-auto": "npx claude-knowledge-base-setup",
     "benchmark": "node scripts/benchmark.js",
     "migrate": "node scripts/migrate.js",
     "vacuum": "node scripts/vacuum.js",
-    "backup": "node scripts/backup.js"
+    "backup": "node scripts/backup.js",
+    "doctor": "node scripts/doctor.js",
+    "install-cross-platform": "node scripts/install-cross-platform.js"
   },
   "keywords": [
     "claude",
@@ -64,9 +67,9 @@
     "zod": "^3.22.4",
     "uuid": "^9.0.1",
     "node-cron": "^3.0.3",
-    "better-sqlite3": "^9.2.2",
+    "sqlite3": "^5.1.6",
     "natural": "^6.12.0",
-    "stopwords": "^2.0.1",
+    "stopword": "^2.0.0",
     "chokidar": "^3.5.3",
     "lru-cache": "^10.1.0",
     "fastest-levenshtein": "^1.0.16",
@@ -79,7 +82,7 @@
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.8",
     "@types/node-cron": "^3.0.11",
-    "@types/better-sqlite3": "^7.6.8",
+    "@types/sqlite3": "^3.1.8",
     "@types/natural": "^5.1.3",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
@@ -98,7 +101,10 @@
     "scripts/**/*",
     "config/**/*",
     "migrations/**/*",
+    "docs/**/*",
+    ".mcp/**/*",
     "README.md",
+    "INSTALL.md",
     "LICENSE"
   ],
   "bin": {
@@ -106,7 +112,8 @@
   },
   "optionalDependencies": {
     "inquirer": "^9.2.12",
-    "fuse.js": "^7.0.0"
+    "fuse.js": "^7.0.0",
+    "better-sqlite3": "^9.2.2"
   },
   "funding": {
     "type": "github",
@@ -126,5 +133,10 @@
       "inspiration": "Black Sea coastal innovation",
       "built_with": "Georgian hospitality and technical excellence"
     }
+  },
+  "postinstall": {
+    "scripts": [
+      "node scripts/post-install-check.js"
+    ]
   }
 }
